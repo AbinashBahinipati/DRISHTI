@@ -461,7 +461,7 @@ export const VolunteerDashboard: React.FC = () => {
                     >
                       {/* Header Row */}
                       <div className="incident-card-top-row">
-                        <div className="incident-badges-group">
+                        <div className="incident-badges-group flex-wrap">
                           <span className={`badge-priority ${incident.urgency === 'Critical' ? 'priority-critical' : 'priority-high'}`}>
                             PRIORITY {idx + 1} • {incident.urgency?.toUpperCase()}
                           </span>
@@ -470,6 +470,16 @@ export const VolunteerDashboard: React.FC = () => {
                             <CheckCircle2 size={11} className="text-emerald-400 shrink-0" />
                             {confidence}% VERIFIED
                           </span>
+
+                          {isOffline || incident.status === 'PendingSync' ? (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                              CACHED INCIDENT
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                              LIVE INCIDENT
+                            </span>
+                          )}
                         </div>
 
                         <span className="incident-id-tag">
@@ -575,7 +585,9 @@ export const VolunteerDashboard: React.FC = () => {
           <div className="command-card nearby-resources-card">
             <div className="command-card-header">
               <span className="command-card-title">NEARBY RESPONSE RESOURCES</span>
-              <span className="text-[10px] font-bold text-sky-400">15 KM RADIUS</span>
+              <span className={`text-[10px] font-bold ${isOffline ? 'text-amber-400' : 'text-sky-400'}`}>
+                {isOffline ? 'CACHED (OFFLINE)' : '15 KM RADIUS'}
+              </span>
             </div>
 
             {facilitiesLoading ? (

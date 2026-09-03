@@ -3,7 +3,6 @@ import { useLocation, useOutlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
-import { OfflineStatusBar } from '../components/ui/OfflineStatusBar';
 import { PageTransition } from '../components/ui/PageTransition';
 import '../styles/AppLayout.css';
 
@@ -38,7 +37,6 @@ const AppLayout: React.FC = () => {
         <TopBar
           onMobileMenuClick={toggleMobileMenu}
         />
-        <OfflineStatusBar />
         <main className="app-content relative overflow-x-hidden">
           <AnimatePresence mode="wait">
             <PageTransition key={location.pathname}>

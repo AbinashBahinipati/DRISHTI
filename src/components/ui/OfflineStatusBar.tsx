@@ -1,65 +1,97 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WifiOff, RefreshCw, CheckCircle2, Database } from 'lucide-react';
+import { WifiOff, RefreshCw, CheckCircle2, CloudUpload } from 'lucide-react';
 import { useConnectivity } from '../../hooks/useConnectivity';
 
 export const OfflineStatusBar: React.FC = () => {
   const { status, isOffline, pendingSyncCount, triggerSync } = useConnectivity();
+  const [showReconnected, setShowReconnected] = useState(false);
+  const [prevOffline, setPrevOffline] = useState(isOffline);
+
+  useEffect(() => {
+    if (prevOffline && !isOffline) {
+      setShowReconnected(true);
+      const timer = setTimeout(() => setShowReconnected(false), 4000);
+      return () => clearTimeout(timer);
+    }
+    setPrevOffline(isOffline);
+  }, [isOffline, prevOffline]);
+
+  const isVisible = isOffline || pendingSyncCount > 0 || status === 'SYNCING' || showReconnected;
 
   return (
     <AnimatePresence>
-      {(isOffline || pendingSyncCount > 0 || status === 'SYNCING') && (
+      {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: -20, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: 'auto' }}
-          exit={{ opacity: 0, y: -20, height: 0 }}
-          transition={{ duration: 0.25 }}
-          className="w-full z-40 px-4 py-2 flex items-center justify-between text-xs border-b backdrop-blur-md"
+          initial={{ opacity: 0, y: -24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -24 }}
+          transition={{ duration: 0.2 }}
+          className="w-full sticky top-0 z-50 px-4 py-2 flex items-center justify-between text-xs border-b shadow-md backdrop-blur-md"
           style={{
             backgroundColor: isOffline 
-              ? 'rgba(234, 88, 12, 0.12)' 
+              ? 'rgba(234, 88, 12, 0.92)' 
               : status === 'SYNCING'
-                ? 'rgba(59, 130, 246, 0.12)'
-                : 'rgba(16, 185, 129, 0.12)',
+                ? 'rgba(37, 99, 235, 0.92)'
+                : 'rgba(16, 185, 129, 0.92)',
             borderColor: isOffline
-              ? 'rgba(234, 88, 12, 0.3)'
+              ? 'rgba(249, 115, 22, 0.5)'
               : status === 'SYNCING'
-                ? 'rgba(59, 130, 246, 0.3)'
-                : 'rgba(16, 185, 129, 0.3)',
-            color: isOffline ? '#fdba74' : status === 'SYNCING' ? '#93c5fd' : '#86efac'
+                ? 'rgba(96, 165, 250, 0.5)'
+                : 'rgba(52, 211, 153, 0.5)',
+            color: '#ffffff'
           }}
         >
-          <div className="flex items-center gap-2.5 max-w-full overflow-hidden">
+          <div className="flex items-center gap-2 max-w-full overflow-hidden">
             {isOffline ? (
-              <span className="p-1 rounded bg-orange-500/20 text-orange-400 flex-shrink-0">
+              <span className="p-1 rounded bg-black/20 text-white flex-shrink-0">
                 <WifiOff size={14} />
               </span>
             ) : status === 'SYNCING' ? (
-              <span className="p-1 rounded bg-blue-500/20 text-blue-400 flex-shrink-0 animate-spin">
+              <span className="p-1 rounded bg-black/20 text-white flex-shrink-0 animate-spin">
                 <RefreshCw size={14} />
               </span>
             ) : (
-              <span className="p-1 rounded bg-emerald-500/20 text-emerald-400 flex-shrink-0">
+              <span className="p-1 rounded bg-black/20 text-white flex-shrink-0">
                 <CheckCircle2 size={14} />
               </span>
             )}
 
             <div className="flex items-center gap-2 truncate">
-              <span className="font-bold tracking-wider uppercase text-[11px]">
-                {isOffline ? 'OFFLINE TACTICAL MODE' : status === 'SYNCING' ? 'SYNCING TO CLOUD' : 'LOCAL ENGINE READY'}
+              <span className="font-bold tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+                {isOffline ? (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-300 animate-pulse" />
+                    OFFLINE MODE
+                  </>
+                ) : status === 'SYNCING' ? (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-blue-300 animate-pulse" />
+                    SYNCHRONIZING...
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-200" />
+                    CONNECTED
+                  </>
+                )}
               </span>
-              <span className="text-zinc-400 hidden sm:inline">•</span>
-              <span className="text-zinc-300 hidden md:inline flex items-center gap-1">
-                <Database size={11} className="inline text-amber-400" />
-                IndexedDB & Local AI Veracity Active
+              <span className="text-white/60 hidden sm:inline">•</span>
+              <span className="text-white/95 text-[11px] truncate">
+                {isOffline
+                  ? 'Live data unavailable. Showing cached/last synchronized information.'
+                  : status === 'SYNCING'
+                    ? 'Synchronizing queued reports with emergency network...'
+                    : 'Connection restored. Telemetry feeds active.'}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2.5 flex-shrink-0">
             {pendingSyncCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                {pendingSyncCount} {pendingSyncCount === 1 ? 'Action' : 'Actions'} Pending Sync
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/30 text-amber-100 border border-white/20 flex items-center gap-1">
+                <CloudUpload size={11} />
+                {pendingSyncCount} {pendingSyncCount === 1 ? 'report waiting to sync' : 'reports waiting to sync'}
               </span>
             )}
 
@@ -67,9 +99,9 @@ export const OfflineStatusBar: React.FC = () => {
               <button
                 type="button"
                 onClick={triggerSync}
-                className="px-2.5 py-1 rounded bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-[11px] transition-colors flex items-center gap-1 shadow-sm"
+                className="px-2.5 py-0.5 rounded bg-white text-slate-900 font-bold text-[10px] hover:bg-slate-100 transition-colors flex items-center gap-1 shadow-sm"
               >
-                <RefreshCw size={11} className={status === 'SYNCING' ? 'animate-spin' : ''} />
+                <RefreshCw size={10} className={status === 'SYNCING' ? 'animate-spin' : ''} />
                 Sync Now
               </button>
             )}
@@ -79,3 +111,5 @@ export const OfflineStatusBar: React.FC = () => {
     </AnimatePresence>
   );
 };
+
+export default OfflineStatusBar;
