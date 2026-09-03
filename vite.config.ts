@@ -15,6 +15,43 @@ export default defineConfig({
     host: true
   },
   plugins: [
+    {
+      name: 'api-serverless-dev-middleware',
+      configureServer(server) {
+        server.middlewares.use(async (req, res, next) => {
+          if (req.url?.startsWith('/api/firms')) {
+            try {
+              const url = new URL(req.url, 'http://localhost');
+              const query = Object.fromEntries(url.searchParams.entries());
+              const resShim = {
+                status(code: number) {
+                  res.statusCode = code;
+                  return this;
+                },
+                setHeader(name: string, value: string) {
+                  res.setHeader(name, value);
+                  return this;
+                },
+                json(data: any) {
+                  res.setHeader('Content-Type', 'application/json');
+                  return res.end(JSON.stringify(data));
+                },
+                send(body: any) {
+                  return res.end(body);
+                }
+              };
+              const { default: handler } = await import('./api/firms.ts');
+              return await handler({ query }, resShim);
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              return res.end(JSON.stringify({ error: err.message }));
+            }
+          }
+          next();
+        });
+      }
+    },
     react(),
     VitePWA({
       registerType: 'autoUpdate',

@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import AppLayout from './layouts/AppLayout';
+import { OfflineStatusBar } from './components/ui/OfflineStatusBar';
 import { LoaderOne } from './components/ui/loader';
 
 // Lazy loaded routes
@@ -53,6 +54,7 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
+      <OfflineStatusBar />
       <Suspense fallback={
         <div className="flex items-center justify-center h-screen bg-bg">
           <LoaderOne />

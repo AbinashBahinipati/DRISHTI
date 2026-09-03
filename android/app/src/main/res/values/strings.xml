@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DRISHTI</string>
+    <string name="title_activity_main">DRISHTI</string>
+    <string name="package_name">com.drishti.disastermanagement</string>
+    <string name="custom_url_scheme">com.drishti.disastermanagement</string>
+</resources>

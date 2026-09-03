@@ -4,7 +4,6 @@ import {
   MapPin,
   RefreshCw,
   WifiOff,
-  AlertTriangle,
   Radio,
   AlertOctagon,
   Clock
@@ -170,29 +169,20 @@ export const EarlyWarning: React.FC = () => {
       />
 
       {/* 3. Data Quality & Offline Advisory Banners */}
-      {isOffline && (
+      {isOffline && hasData && (
         <div className="ew-data-quality-banner">
           <WifiOff size={16} className="text-amber-400 flex-shrink-0" />
           <span>
-            <strong>OFFLINE RESILIENCE MODE:</strong> Early warning scores are calculated using locally cached meteorological observations and IndexedDB verified reports.
+            <strong>OFFLINE:</strong> Risk assessment based on last synchronized data. Live sensor connection paused.
           </span>
         </div>
       )}
 
-      {dataQuality.freshness === 'Stale' && !isOffline && (
-        <div className="ew-data-quality-banner">
-          <AlertTriangle size={16} className="text-amber-400 flex-shrink-0" />
-          <span>
-            <strong>Limited Confidence — Data Latency:</strong> Telemetry streams were updated over 2 hours ago. Assessment confidence is automatically calibrated until new sensor observations arrive.
-          </span>
-        </div>
-      )}
-
-      {!hasData && (
+      {isOffline && !hasData && (
         <div className="ew-data-quality-banner critical-notice">
           <AlertOctagon size={16} className="text-red-400 flex-shrink-0" />
           <span>
-            <strong>Insufficient Data:</strong> Sensor stream connection in progress. Showing nominal baseline monitoring until real-time telemetry is received.
+            <strong>OFFLINE:</strong> Risk assessment unavailable offline (no prior synchronized observations found).
           </span>
         </div>
       )}

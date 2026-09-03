@@ -138,8 +138,14 @@ export const ReportIncident: React.FC = () => {
           <div className="success-icon-wrapper">
             <CheckCircle2 size={32} />
           </div>
-          <h2 className="success-title">Incident Report Received & Analyzed</h2>
-          <p className="success-desc">Your report has been ingested and audited by the DRISHTI AI Verification Agent.</p>
+          <h2 className="success-title">
+            {submittedReport.status === 'PendingSync' ? 'Report Saved Offline' : 'Incident Report Received & Analyzed'}
+          </h2>
+          <p className="success-desc">
+            {submittedReport.status === 'PendingSync' 
+              ? 'Report saved locally in IndexedDB. Waiting for connection to synchronize with regional dispatch.'
+              : 'Your report has been ingested and audited by the DRISHTI AI Verification Agent.'}
+          </p>
 
           {/* AI Assessment Banner on Success */}
           <div style={{
@@ -184,9 +190,9 @@ export const ReportIncident: React.FC = () => {
               <span className="meta-value">{submittedReport.locationName}</span>
             </div>
             <div className="meta-row">
-              <span className="meta-label">Live Status</span>
-              <span className="meta-value" style={{ color: verdict === 'Genuine' ? '#22c55e' : verdict === 'Avoid' ? '#ef4444' : '#f97316' }}>
-                {submittedReport.status.toUpperCase()}
+              <span className="meta-label">Status</span>
+              <span className="meta-value" style={{ color: submittedReport.status === 'PendingSync' ? '#f59e0b' : verdict === 'Genuine' ? '#22c55e' : verdict === 'Avoid' ? '#ef4444' : '#f97316' }}>
+                {submittedReport.status === 'PendingSync' ? 'SAVED OFFLINE (PENDING SYNC)' : submittedReport.status.toUpperCase()}
               </span>
             </div>
           </div>

@@ -310,9 +310,11 @@ export async function fetchOrchestratedNASA_FIRMS(
       const bbox = `${(userLongitude - 0.5).toFixed(2)},${(userLatitude - 0.5).toFixed(2)},${(userLongitude + 0.5).toFixed(2)},${(userLatitude + 0.5).toFixed(2)}`;
       let csvText: string | null = null;
 
-      // Try serverless proxy first if available
+      // Try serverless proxy first if available (configurable base URL for Android / relative for Vercel)
       try {
-        const proxyRes = await fetch(`/api/firms?bbox=${bbox}&days=1`, { cache: 'no-store' });
+        const apiBase = ((import.meta as any).env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
+        const proxyUrl = `${apiBase}/api/firms?bbox=${bbox}&days=1`;
+        const proxyRes = await fetch(proxyUrl, { cache: 'no-store' });
         if (proxyRes.ok) {
           csvText = await proxyRes.text();
         }

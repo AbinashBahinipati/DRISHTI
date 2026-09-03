@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { resolveFacilityPhoto } from '../utils/facilityPhotoResolver';
 
 export interface Facility {
   id: number | string;
@@ -11,19 +12,22 @@ export interface Facility {
   phone?: string;
   capacity?: string;
   status?: string;
-  image?: string;
+  image?: string | null;
+  photoAttribution?: string;
+  photoLoading?: boolean;
+  tags?: Record<string, any>;
 }
 
-// Haversine formula to calculate distance in km
+// Haversine formula to calculate exact distance in km
 export const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2); 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
   return Number((R * c).toFixed(2));
 };
 
@@ -52,7 +56,7 @@ export const useNearbyFacilities = (lat?: number, lon?: number, radiusKm: number
   const fetchedCoordsRef = useRef<string>('');
 
   useEffect(() => {
-    // Re-fetch only when coordinate changes by more than ~100m
+    // Re-fetch only when coordinates change by more than ~100m
     const coordKey = `${currentLat.toFixed(3)}_${currentLon.toFixed(3)}_${radiusKm}`;
     if (fetchedCoordsRef.current === coordKey) return;
     fetchedCoordsRef.current = coordKey;
@@ -68,7 +72,7 @@ export const useNearbyFacilities = (lat?: number, lon?: number, radiusKm: number
 
       const radiusMeters = Math.min(30000, Math.max(3000, Math.round(radiusKm * 1000)));
 
-      // 1. Try Live Spatial Overpass Query around User's Location
+      // 1. Query Live Spatial Overpass API around User's Exact Location
       const overpassQuery = `[out:json][timeout:15];
 (
   node["amenity"~"hospital|clinic|police|fire_station|pharmacy"](around:${radiusMeters}, ${currentLat}, ${currentLon});
@@ -76,7 +80,7 @@ export const useNearbyFacilities = (lat?: number, lon?: number, radiusKm: number
   node["emergency"~"ambulance_station|disaster_response"](around:${radiusMeters}, ${currentLat}, ${currentLon});
   node["shelter_type"](around:${radiusMeters}, ${currentLat}, ${currentLon});
 );
-out center 60;`;
+out center tags 60;`;
 
       let overpassSuccess = false;
 
@@ -125,6 +129,12 @@ out center 60;`;
                   tags['addr:city'] || tags['addr:district']
                 ].filter(Boolean);
 
+                // Direct image from OSM tags if present
+                let directImg: string | null = null;
+                if (typeof tags.image === 'string' && tags.image.startsWith('http')) {
+                  directImg = tags.image;
+                }
+
                 liveItems.push({
                   id: `osm-${el.type}-${el.id}`,
                   type: facilityType,
@@ -132,10 +142,13 @@ out center 60;`;
                   lat: elLat,
                   lon: elLon,
                   distance: dist,
-                  address: addressParts.length > 0 ? addressParts.join(', ') : `Near ${name}`,
+                  address: addressParts.length > 0 ? addressParts.join(', ') : `${dist.toFixed(1)} km from your location`,
                   phone: tags.phone || tags['contact:phone'] || (facilityType === 'police' ? '112 / 100' : facilityType === 'fire' ? '101' : facilityType === 'hospital' ? '108' : undefined),
                   capacity: tags.beds ? `${tags.beds} Beds • Emergency Ward` : tags['emergency:capacity'] || 'Operational Emergency Hub',
-                  status: 'Verified Live OSM Facility'
+                  status: 'Verified Live OSM Facility',
+                  image: directImg,
+                  photoLoading: !directImg,
+                  tags: tags
                 });
               }
 
@@ -183,15 +196,17 @@ out center 60;`;
               const addrParts = [p.street, p.city || p.district, p.state].filter(Boolean);
 
               liveItems.push({
-                id: `live-${p.osm_id || Math.random().toString(36).substr(2, 9)}`,
+                id: `live-${p.osm_id || Math.random().toString(36).substring(2, 9)}`,
                 type: detectedType,
                 name: name,
                 lat: fLat,
                 lon: fLon,
                 distance: dist,
-                address: addrParts.length > 0 ? addrParts.join(', ') : 'Nearby Local Facility',
+                address: addrParts.length > 0 ? addrParts.join(', ') : `${dist.toFixed(1)} km from your location`,
                 status: 'Verified Live OSM POI',
-                phone: detectedType === 'police' ? '112 / 100' : detectedType === 'fire' ? '101' : detectedType === 'hospital' ? '108' : undefined
+                phone: detectedType === 'police' ? '112 / 100' : detectedType === 'fire' ? '101' : detectedType === 'hospital' ? '108' : undefined,
+                image: null,
+                photoLoading: true
               });
             }
           } catch {}
@@ -200,11 +215,38 @@ out center 60;`;
         await Promise.all(fetchPromises);
       }
 
-      // Sort by proximity to current location
+      // Sort strictly by actual distance from the user's coordinates
       liveItems.sort((a, b) => (a.distance || 0) - (b.distance || 0));
 
       if (liveItems.length > 0) {
         setFacilities(liveItems);
+
+        // Asynchronously resolve authentic photos from Wikimedia Commons for the top facilities
+        const topToResolve = liveItems.slice(0, 10);
+        Promise.all(
+          topToResolve.map(async (fac) => {
+            if (fac.image) return fac;
+            const photoInfo = await resolveFacilityPhoto(fac, currentLat, currentLon);
+            return {
+              ...fac,
+              image: photoInfo.photoUrl,
+              photoAttribution: photoInfo.photoAttribution,
+              photoLoading: false
+            };
+          })
+        ).then((resolvedTop) => {
+          if (!controller.signal.aborted) {
+            setFacilities((prev) => {
+              const mapById = new Map(resolvedTop.map((r) => [r.id, r]));
+              return prev.map((item) => mapById.get(item.id) || { ...item, photoLoading: false });
+            });
+          }
+        }).catch(() => {
+          if (!controller.signal.aborted) {
+            setFacilities((prev) => prev.map((item) => ({ ...item, photoLoading: false })));
+          }
+        });
+
         try {
           const { dbPutBatch } = await import('../utils/indexedDB');
           await dbPutBatch('facilities', liveItems);
@@ -216,11 +258,12 @@ out center 60;`;
           const cached = await dbGetAll<Facility>('facilities');
           if (cached && cached.length > 0) {
             const withDist = cached
-              .map(f => ({
+              .map((f) => ({
                 ...f,
-                distance: calculateDistance(currentLat, currentLon, f.lat, f.lon)
+                distance: calculateDistance(currentLat, currentLon, f.lat, f.lon),
+                photoLoading: false
               }))
-              .filter(f => (f.distance || 0) <= radiusKm + 10)
+              .filter((f) => (f.distance || 0) <= radiusKm + 10)
               .sort((a, b) => (a.distance || 0) - (b.distance || 0));
 
             if (withDist.length > 0) {
