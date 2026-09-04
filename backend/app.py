@@ -132,14 +132,18 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://drishti-jet.vercel.app",
 ]
 
-env_origins = os.getenv("CORS_ORIGINS") or os.getenv("FRONTEND_URL")
-if env_origins:
-    for origin in env_origins.split(","):
-        cleaned = origin.strip()
-        if cleaned and cleaned not in ALLOWED_ORIGINS:
-            ALLOWED_ORIGINS.append(cleaned)
+# Support additional origins via CORS_ORIGINS and FRONTEND_URL environment variables
+for env_var in ("CORS_ORIGINS", "FRONTEND_URL"):
+    env_val = os.getenv(env_var)
+    if env_val:
+        for origin in env_val.split(","):
+            cleaned = origin.strip().rstrip("/")
+            # Disallow wildcard '*' since allow_credentials=True requires explicit origins
+            if cleaned and cleaned != "*" and cleaned not in ALLOWED_ORIGINS:
+                ALLOWED_ORIGINS.append(cleaned)
 
 app.add_middleware(
     CORSMiddleware,
