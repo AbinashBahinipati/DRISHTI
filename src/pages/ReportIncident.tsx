@@ -5,11 +5,12 @@ import {
   Activity, Sun, Building, Map, AlertTriangle,
   MapPin, Camera, X, CheckCircle2, ChevronRight,
   ShieldAlert, Loader2, MessageSquare, Upload,
-  TriangleAlert, CheckCircle, AlertCircle
+  TriangleAlert, CheckCircle, AlertCircle, ArrowLeft
 } from 'lucide-react';
-import { useLocation as useReactRouterLocation } from 'react-router-dom';
+import { useLocation as useReactRouterLocation, useNavigate } from 'react-router-dom';
 import { useLocation } from '../hooks/useLocation';
 import { useReports } from '../hooks/useReports';
+import { useUserAuth } from '../hooks/useUserAuth';
 import type { ReportType, ReportUrgency, IncidentReport } from '../types/report';
 import '../styles/ReportIncident.css';
 
@@ -39,11 +40,13 @@ const QUICK_TAGS = [
 ];
 
 export const ReportIncident: React.FC = () => {
+  const navigate = useNavigate();
   const routerLocation = useReactRouterLocation();
   const prefill = routerLocation.state?.prefill;
 
   const { location, requestLocation } = useLocation();
   const { reports, submitReport } = useReports();
+  const { user, isAuthenticated } = useUserAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State
@@ -100,6 +103,9 @@ export const ReportIncident: React.FC = () => {
     const fullDesc = [description, ...selectedTags.map(t => `#${t.replace(/\s+/g, '')}`)].filter(Boolean).join('\n\n');
     const locName = manualLocation || location.address || (location.coords ? `Lat: ${location.coords.latitude.toFixed(4)}, Lon: ${location.coords.longitude.toFixed(4)}` : 'Unknown Location');
 
+    const authorName = isAuthenticated && user ? user.fullName : 'Citizen / Guest';
+    const authorHandle = isAuthenticated && user ? user.emailOrPhone : '@citizen_guest';
+
     const result = await submitReport({
       type: selectedType,
       locationName: locName,
@@ -109,6 +115,13 @@ export const ReportIncident: React.FC = () => {
       urgency,
       peopleAffected: selectedTags.includes('People trapped') ? 'Unknown (Trapped)' : 'Unknown',
       tags: selectedTags,
+      sourceInfo: {
+        platform: 'DRISHTI Web App',
+        authorName,
+        authorHandle,
+        verifiedUser: isAuthenticated,
+        engagementStats: { shares: 1, corroborations: 1 }
+      }
     });
 
     setIsSubmitting(false);
@@ -130,7 +143,24 @@ export const ReportIncident: React.FC = () => {
   if (submittedReport) {
     const analysis = submittedReport.aiAnalysis;
     const verdict = analysis?.verdict || 'Needs Review';
-    const score = analysis?.confidenceScore || 75;
+    const ml = submittedReport.mlAssessment;
+    const hasMl = ml && ml.status === 'completed';
+    const isMlPending = submittedReport.status === 'PendingSync' || (ml && ml.status === 'pending');
+    const isMlUnavailable = !hasMl && !isMlPending;
+
+    const mlPredictionLabel = hasMl
+      ? (ml.prediction === 'informative' ? 'Informative Report' : 'Low Information Content')
+      : isMlPending
+        ? 'AI assessment pending network synchronization'
+        : 'AI assessment unavailable';
+
+    const mlScore = hasMl
+      ? Number((ml.informative_probability * 100).toFixed(1))
+      : null;
+
+    const mlColor = hasMl
+      ? (ml.prediction === 'informative' ? '#22c55e' : '#f97316')
+      : '#94a3b8';
 
     return (
       <div className="report-container">
@@ -147,11 +177,17 @@ export const ReportIncident: React.FC = () => {
               : 'Your report has been submitted to the emergency network and queued for official verification.'}
           </p>
 
-          {/* AI Assessment Banner on Success */}
+          {/* AI Content Assessment Banner on Success */}
           <div style={{
             width: '100%',
-            background: verdict === 'Genuine' ? 'rgba(34, 197, 94, 0.1)' : verdict === 'Avoid' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(249, 115, 22, 0.1)',
-            border: `1px solid ${verdict === 'Genuine' ? 'rgba(34, 197, 94, 0.3)' : verdict === 'Avoid' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(249, 115, 22, 0.3)'}`,
+            background: hasMl
+              ? (ml.prediction === 'informative' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(249, 115, 22, 0.1)')
+              : 'rgba(255, 255, 255, 0.05)',
+            border: `1px solid ${
+              hasMl
+                ? (ml.prediction === 'informative' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(249, 115, 22, 0.3)')
+                : 'rgba(255, 255, 255, 0.15)'
+            }`,
             borderRadius: '10px',
             padding: '14px 18px',
             textAlign: 'left',
@@ -159,19 +195,46 @@ export const ReportIncident: React.FC = () => {
             flexDirection: 'column',
             gap: '6px'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{
                 fontSize: '0.8rem',
                 fontWeight: 700,
-                color: verdict === 'Genuine' ? '#22c55e' : verdict === 'Avoid' ? '#ef4444' : '#f97316'
+                color: mlColor,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
               }}>
-                🤖 PRELIMINARY AI AUDIT: {verdict === 'Genuine' ? 'HIGH CONFIDENCE (GENUINE EVIDENCE)' : verdict === 'Avoid' ? 'AVOID (SUSPECTED FALSE/SPAM)' : 'MEDIUM CONFIDENCE (INVESTIGATING)'}
+                🤖 AI CONTENT ASSESSMENT: {mlPredictionLabel.toUpperCase()}
               </span>
-              <span style={{ fontSize: '0.78rem', color: '#fff', fontWeight: 600 }}>Score: {score}%</span>
+              {hasMl && mlScore !== null && (
+                <span style={{ fontSize: '0.78rem', color: '#fff', fontWeight: 600 }}>
+                  AI Report Relevance: {mlScore}%
+                </span>
+              )}
             </div>
+
+            {hasMl && (
+              <p style={{ margin: 0, fontSize: '0.74rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
+                Report situational relevance analyzed via CrisisMMD disaster model. Final verification decision rests with authorized emergency personnel.
+              </p>
+            )}
+
+            {isMlPending && (
+              <p style={{ margin: 0, fontSize: '0.74rem', color: '#f59e0b', lineHeight: 1.4 }}>
+                Report saved locally offline. Content assessment will run automatically once network connectivity is restored.
+              </p>
+            )}
+
+            {isMlUnavailable && (
+              <p style={{ margin: 0, fontSize: '0.74rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
+                AI assessment unavailable. Your report is preserved safely and queued for human dispatcher review.
+              </p>
+            )}
+
+            {/* Preserved ground evidence reasoning if present */}
             {analysis?.reasoning?.[0] && (
-              <p style={{ margin: 0, fontSize: '0.76rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
-                {analysis.reasoning[0]}
+              <p style={{ margin: '4px 0 0', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.3 }}>
+                Ground correlation: {analysis.reasoning[0]}
               </p>
             )}
           </div>
@@ -197,8 +260,11 @@ export const ReportIncident: React.FC = () => {
             </div>
           </div>
           <div className="success-actions">
-            <button className="success-btn btn-secondary" onClick={() => (window.location.href = '/app/reports')}>
-              View in All Reports Feed
+            <button className="success-btn btn-secondary" onClick={() => navigate('/user')}>
+              Return to Citizen Safety
+            </button>
+            <button className="success-btn btn-secondary" onClick={() => navigate('/user/map')}>
+              View on Citizen Map
             </button>
             <button className="success-btn btn-primary" onClick={resetForm}>
               Report Another Incident
@@ -213,6 +279,19 @@ export const ReportIncident: React.FC = () => {
     <div className="report-page-wrapper">
       <div className="report-container">
 
+        {/* ── Top Navigation / Return to Citizen Home ── */}
+        <div className="report-top-nav-bar">
+          <button
+            type="button"
+            className="report-back-btn"
+            onClick={() => navigate('/user')}
+            title="Back to Citizen Dashboard"
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Citizen Home</span>
+          </button>
+        </div>
+
         {/* ── Header Top Row ── */}
         <div className="report-header-top">
           <header className="report-header">
@@ -223,6 +302,27 @@ export const ReportIncident: React.FC = () => {
             <div className="report-trust-note">
               <ShieldAlert size={14} />
               Only report genuine emergencies and disaster-related situations.
+            </div>
+
+            {/* Reporter Identity Info */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '0.5rem',
+                fontSize: '0.8rem',
+                color: 'var(--color-text-secondary, #64748b)',
+                backgroundColor: 'var(--color-bg, #f8fafc)',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '8px',
+                border: '1px solid var(--color-border, #e2e8f0)'
+              }}
+            >
+              <CheckCircle2 size={14} color="#10b981" />
+              <span>
+                Reporting as: <strong style={{ color: 'var(--color-text, #0f172a)' }}>{isAuthenticated && user ? user.fullName : 'Anonymous Citizen (Guest)'}</strong>
+              </span>
             </div>
           </header>
 
@@ -423,7 +523,7 @@ export const ReportIncident: React.FC = () => {
 
         <button className="submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? (
-            <><Loader2 className="animate-spin" size={20} /> SUBMITTING...</>
+            <><Loader2 className="animate-spin" size={20} /> SUBMITTING & ANALYZING CONTENT...</>
           ) : (
             'SUBMIT INCIDENT'
           )}
@@ -518,6 +618,47 @@ export const ReportIncident: React.FC = () => {
                         </span>
                       </div>
                     </div>
+
+                    {/* AI Content Assessment in Drawer */}
+                    <div style={{ marginTop: 16 }}>
+                      <h3 className="drawer-section-title">AI Content Assessment</h3>
+                      <div style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 8,
+                        padding: '12px 14px',
+                        marginTop: 8
+                      }}>
+                        {viewingReport.mlAssessment?.status === 'completed' ? (
+                          <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '0.82rem' }}>
+                              <span style={{ color: 'rgba(255,255,255,0.6)' }}>Classification:</span>
+                              <strong style={{ color: viewingReport.mlAssessment.prediction === 'informative' ? '#22c55e' : '#f97316' }}>
+                                {viewingReport.mlAssessment.prediction === 'informative' ? 'Informative Report' : 'Low Information Content'}
+                              </strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                              <span style={{ color: 'rgba(255,255,255,0.6)' }}>AI Report Relevance:</span>
+                              <strong style={{ color: '#38bdf8' }}>
+                                {(viewingReport.mlAssessment.informative_probability * 100).toFixed(1)}%
+                              </strong>
+                            </div>
+                            <div style={{ marginTop: 6, fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)' }}>
+                              * Situational relevance probability evaluated via CrisisMMD disaster model.
+                            </div>
+                          </>
+                        ) : viewingReport.status === 'PendingSync' || viewingReport.mlAssessment?.status === 'pending' ? (
+                          <div style={{ color: '#f59e0b', fontSize: '0.8rem' }}>
+                            ⏳ Saved offline. AI assessment pending network synchronization.
+                          </div>
+                        ) : (
+                          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>
+                            ⚠️ AI assessment unavailable.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {viewingReport.description && (
                       <div style={{ marginTop: 16 }}>
                         <h3 className="drawer-section-title">Description</h3>

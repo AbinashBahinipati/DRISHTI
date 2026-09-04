@@ -2,15 +2,21 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileCheck2, ShieldCheck, AlertCircle, AlertTriangle,
-  Search, Plus, MapPin, Clock, CheckCircle2,
+  Search, MapPin, Clock, CheckCircle2,
   XCircle, Sparkles, Activity, Eye,
   ChevronRight, X, ExternalLink, Camera,
   Waves, Wind, Flame, Mountain, CloudRain, Sun, Building, Map,
   Globe, Send, MessageSquare, Radio, Share2
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useReports } from '../hooks/useReports';
-import type { IncidentReport, ReportType, ReportPlatform } from '../types/report';
+import {
+  isDirectSourceReport,
+  getDirectSourceLabel,
+  getReportPriorityVerdict,
+  type IncidentReport,
+  type ReportType,
+  type ReportPlatform
+} from '../types/report';
 import '../styles/Reports.css';
 
 const TYPE_ICONS: Record<ReportType, { icon: React.ReactNode; color: string; label: string }> = {
@@ -39,7 +45,6 @@ const PLATFORM_CONFIG: Record<ReportPlatform, { label: string; class: string; ic
 type TabFilter = 'all' | 'high' | 'medium' | 'avoid';
 
 export const Reports: React.FC = () => {
-  const navigate = useNavigate();
   const { reports, manuallyVerifyReport } = useReports();
 
   // Filters State
@@ -53,19 +58,29 @@ export const Reports: React.FC = () => {
   // Statistics calculation
   const stats = useMemo(() => {
     const total = reports.length;
-    const genuineHigh = reports.filter(r => r.aiAnalysis?.verdict === 'Genuine' || r.aiAnalysis?.confidenceLevel === 'High').length;
-    const mediumReview = reports.filter(r => r.aiAnalysis?.verdict === 'Needs Review' || r.aiAnalysis?.confidenceLevel === 'Medium').length;
-    const avoidSpam = reports.filter(r => r.aiAnalysis?.verdict === 'Avoid' || r.aiAnalysis?.confidenceLevel === 'Low' || r.status === 'Avoid').length;
-    const webAppCount = reports.filter(r => r.sourceInfo?.platform === 'DRISHTI Web App').length;
-    const internetCount = total - webAppCount;
+    let genuineHigh = 0;
+    let mediumReview = 0;
+    let avoidSpam = 0;
+    let webAppCount = 0;
 
+    for (const r of reports) {
+      if (r.sourceInfo?.platform === 'DRISHTI Web App') {
+        webAppCount++;
+      }
+      const v = getReportPriorityVerdict(r);
+      if (v === 'Genuine') genuineHigh++;
+      else if (v === 'Avoid') avoidSpam++;
+      else mediumReview++;
+    }
+
+    const internetCount = total - webAppCount;
     return { total, genuineHigh, mediumReview, avoidSpam, webAppCount, internetCount };
   }, [reports]);
 
   // Filtered reports
   const filteredReports = useMemo(() => {
     return reports.filter(report => {
-      const verdict = report.aiAnalysis?.verdict || (report.status === 'Verified' ? 'Genuine' : report.status === 'Avoid' ? 'Avoid' : 'Needs Review');
+      const verdict = getReportPriorityVerdict(report);
 
       // Tab filter
       if (activeTab === 'high' && verdict !== 'Genuine') return false;
@@ -104,16 +119,6 @@ export const Reports: React.FC = () => {
           <h1 className="reports-title">
             Disaster <span className="reports-title-accent">Reports</span> Feed
           </h1>
-        </div>
-
-        <div className="reports-header-actions">
-          <button
-            className="reports-create-btn"
-            onClick={() => navigate('/app/report')}
-          >
-            <Plus size={16} />
-            Report Incident on Ground
-          </button>
         </div>
       </header>
 
@@ -292,7 +297,17 @@ export const Reports: React.FC = () => {
 
       {/* 4. Incident Reports Cards List */}
       <section className="reports-list-container">
-        {filteredReports.length === 0 ? (
+        {reports.length === 0 ? (
+          <div className="reports-empty-box">
+            <div className="reports-empty-icon">
+              <FileCheck2 size={24} />
+            </div>
+            <h3 style={{ margin: 0, color: '#fff', fontSize: '1rem' }}>No user reports received</h3>
+            <p style={{ margin: 0, fontSize: '0.82rem' }}>
+              Citizen-submitted incident reports and synchronized ground alerts will appear here in real time for review and verification.
+            </p>
+          </div>
+        ) : filteredReports.length === 0 ? (
           <div className="reports-empty-box">
             <div className="reports-empty-icon">
               <FileCheck2 size={24} />
@@ -306,9 +321,29 @@ export const Reports: React.FC = () => {
           filteredReports.map(report => {
             const typeConfig = TYPE_ICONS[report.type] || TYPE_ICONS.Other;
             const analysis = report.aiAnalysis;
-            const verdict = analysis?.verdict || (report.status === 'Verified' ? 'Genuine' : report.status === 'Avoid' ? 'Avoid' : 'Needs Review');
-            const score = analysis?.confidenceScore || (verdict === 'Genuine' ? 94 : verdict === 'Avoid' ? 14 : 64);
+            const verdict = getReportPriorityVerdict(report);
             const verdictClass = verdict === 'Genuine' ? 'high' : verdict === 'Needs Review' ? 'medium' : 'avoid';
+
+            // Identify report origin: direct live telemetry source vs citizen submission
+            const isDirect = isDirectSourceReport(report);
+            const directLabel = isDirect ? getDirectSourceLabel(report) : null;
+
+            // Real ML Assessment from CrisisMMD model (for citizen submissions)
+            const ml = report.mlAssessment;
+            const hasMl = ml && ml.status === 'completed';
+            const isMlPending = ml && ml.status === 'pending';
+            const mlPredictionLabel = hasMl
+              ? (ml.prediction === 'informative' ? 'Informative Report' : 'Low Information Content')
+              : isMlPending
+                ? 'AI assessment pending sync'
+                : 'AI assessment unavailable';
+            const mlScore = hasMl
+              ? Number((ml.informative_probability * 100).toFixed(1))
+              : null;
+            const mlBadgeClass = hasMl
+              ? (ml.prediction === 'informative' ? 'high' : 'avoid')
+              : 'medium';
+
             const source = report.sourceInfo || {
               platform: 'DRISHTI Web App' as ReportPlatform,
               authorName: 'Citizen Reporter',
@@ -402,34 +437,63 @@ export const Reports: React.FC = () => {
                   </span>
                 </div>
 
-                {/* AI Agent Audit Banner */}
-                <div className={`report-ai-audit-banner ${verdictClass}`}>
-                  <div className="report-ai-badge-row">
-                    <span className={`report-ai-verdict-tag ${verdictClass}`}>
-                      <Sparkles size={12} />
-                      {verdict === 'Genuine' ? 'HIGH CONFIDENCE (PRIORITY / GENUINE)' : verdict === 'Needs Review' ? 'MEDIUM CONFIDENCE (INVESTIGATING)' : 'SPAM / AVOID (SUSPECTED FALSE REPORT)'}
-                    </span>
-
-                    <div className="report-ai-confidence-meter">
-                      <span>AI Score: <strong>{score}%</strong></span>
-                      <div className="report-confidence-bar-bg">
-                        <div
-                          className={`report-confidence-bar-fill ${verdictClass}`}
-                          style={{ width: `${score}%` }}
-                        />
-                      </div>
+                {/* Direct Source Observation Banner vs Citizen AI Content Assessment */}
+                {isDirect ? (
+                  <div className="report-direct-source-banner">
+                    <div className="report-direct-source-row">
+                      <span className="report-direct-source-tag">
+                        <Radio size={12} />
+                        DIRECT SOURCE
+                      </span>
+                      <span className="report-direct-source-title">
+                        {directLabel}
+                      </span>
                     </div>
-                  </div>
 
-                  {/* AI Reasoning Points */}
-                  {analysis?.reasoning && analysis.reasoning.length > 0 && (
-                    <ul className="report-ai-bullets">
-                      {analysis.reasoning.slice(0, 2).map((point, idx) => (
-                        <li key={idx}>{point}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                    {/* Multi-Factor Corroboration & Evidence Signals (Preserved for all report types) */}
+                    {analysis?.reasoning && analysis.reasoning.length > 0 && (
+                      <ul className="report-ai-bullets">
+                        {analysis.reasoning.slice(0, 2).map((point, idx) => (
+                          <li key={idx}>{point}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ) : (
+                  <div className={`report-ai-audit-banner ${mlBadgeClass}`}>
+                    <div className="report-ai-badge-row">
+                      <span className={`report-ai-verdict-tag ${mlBadgeClass}`}>
+                        <Sparkles size={12} />
+                        AI CONTENT ASSESSMENT: {mlPredictionLabel}
+                      </span>
+
+                      {hasMl && mlScore !== null ? (
+                        <div className="report-ai-confidence-meter">
+                          <span>AI REPORT RELEVANCE: <strong>{mlScore}%</strong></span>
+                          <div className="report-confidence-bar-bg">
+                            <div
+                              className={`report-confidence-bar-fill ${mlBadgeClass}`}
+                              style={{ width: `${Math.min(100, Math.max(0, mlScore))}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '0.74rem', color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+                          {isMlPending ? 'Syncing with ML Backend...' : 'AI assessment unavailable'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Multi-Factor Corroboration & Evidence Signals (Preserved for all report types) */}
+                    {analysis?.reasoning && analysis.reasoning.length > 0 && (
+                      <ul className="report-ai-bullets">
+                        {analysis.reasoning.slice(0, 2).map((point, idx) => (
+                          <li key={idx}>{point}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
 
                 {/* Report Description & Evidence Image Preview */}
                 <div className="report-card-body-wrapper">
@@ -623,22 +687,89 @@ export const Reports: React.FC = () => {
                   </div>
                 </div>
 
-                {/* AI Agent Full Analysis Breakdown */}
-                {selectedReport.aiAnalysis && (
-                  <div>
-                    <h4 className="report-modal-section-title" style={{ color: '#22c55e' }}>
-                      <Sparkles size={16} />
-                      AI Agent Multi-Factor Verification Audit
+                {/* 1. Direct Source Observation vs Citizen AI Content Assessment */}
+                {isDirectSourceReport(selectedReport) ? (
+                  <div style={{ marginBottom: 16 }}>
+                    <h4 className="report-modal-section-title" style={{ color: '#38bdf8' }}>
+                      <Radio size={16} />
+                      DIRECT SOURCE OBSERVATION
                     </h4>
                     <div className="report-modal-telemetry-box">
                       <div className="report-modal-telemetry-row">
-                        <span>AI Veracity Verdict:</span>
-                        <strong style={{
-                          color: selectedReport.aiAnalysis.verdict === 'Genuine' ? '#22c55e' : selectedReport.aiAnalysis.verdict === 'Needs Review' ? '#f97316' : '#ef4444'
-                        }}>
-                          {selectedReport.aiAnalysis.verdict === 'Genuine' ? 'PRIORITY / GENUINE REPORT' : selectedReport.aiAnalysis.verdict === 'Needs Review' ? 'MEDIUM CONFIDENCE (INVESTIGATING)' : 'SPAM / AVOID (SUSPECTED FALSE)'} ({selectedReport.aiAnalysis.confidenceScore}% Score)
+                        <span>Direct Sensor / Feed Source:</span>
+                        <strong style={{ color: '#38bdf8' }}>
+                          {getDirectSourceLabel(selectedReport)}
                         </strong>
                       </div>
+                      <div className="report-modal-telemetry-row">
+                        <span>Ingestion Pipeline:</span>
+                        <span style={{ color: '#22c55e' }}>Authoritative Live Telemetry Stream</span>
+                      </div>
+                      {selectedReport.sourceInfo?.platform && (
+                        <div className="report-modal-telemetry-row">
+                          <span>Platform Protocol:</span>
+                          <span>{selectedReport.sourceInfo.platform}</span>
+                        </div>
+                      )}
+                      <div style={{ marginTop: 8, fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+                        * Authoritative observation received directly from live telemetry sensor network. Citizen text NLP classification is bypassed for authoritative feeds. Final incident verification decision rests with authorized dispatch personnel.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: 16 }}>
+                    <h4 className="report-modal-section-title" style={{ color: '#38bdf8' }}>
+                      <Sparkles size={16} />
+                      AI CONTENT ASSESSMENT (CrisisMMD Disaster-NLP Model)
+                    </h4>
+                    <div className="report-modal-telemetry-box">
+                      {selectedReport.mlAssessment?.status === 'completed' ? (
+                        <>
+                          <div className="report-modal-telemetry-row">
+                            <span>Content Classification:</span>
+                            <strong style={{
+                              color: selectedReport.mlAssessment.prediction === 'informative' ? '#22c55e' : '#ef4444'
+                            }}>
+                              {selectedReport.mlAssessment.prediction === 'informative' ? 'Informative Report' : 'Low Information Content'}
+                            </strong>
+                          </div>
+                          <div className="report-modal-telemetry-row">
+                            <span>AI REPORT RELEVANCE (Informative Probability):</span>
+                            <strong style={{ color: '#38bdf8' }}>
+                              {(selectedReport.mlAssessment.informative_probability * 100).toFixed(1)}%
+                            </strong>
+                          </div>
+                          <div className="report-modal-telemetry-row">
+                            <span>Low-Information Probability:</span>
+                            <span>
+                              {(selectedReport.mlAssessment.not_informative_probability * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div style={{ marginTop: 8, fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>
+                            * Probabilities generated directly by CrisisMMD TF-IDF + Logistic Regression model. Measures situational report informativeness, not absolute truthfulness. Final verification decision rests with authorized dispatch personnel.
+                          </div>
+                        </>
+                      ) : selectedReport.mlAssessment?.status === 'pending' ? (
+                        <div style={{ color: '#f59e0b', fontSize: '0.82rem' }}>
+                          ⏳ Report saved offline. AI assessment will execute upon network synchronization.
+                        </div>
+                      ) : (
+                        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.82rem' }}>
+                          ⚠️ AI assessment unavailable (Backend offline or unreachable). No simulated score generated.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. Multi-Factor Ground Evidence & Sensor Telemetry (Preserved Separately) */}
+                {selectedReport.aiAnalysis && (
+                  <div>
+                    <h4 className="report-modal-section-title" style={{ color: '#22c55e' }}>
+                      <CheckCircle2 size={16} />
+                      Multi-Factor Ground Evidence & Sensor Corroboration
+                    </h4>
+                    <div className="report-modal-telemetry-box">
                       <div className="report-modal-telemetry-row">
                         <span>IoT Sensor Correlation:</span>
                         <span>{selectedReport.aiAnalysis.sensorCorrelation || 'Corroborated'}</span>
@@ -660,7 +791,7 @@ export const Reports: React.FC = () => {
 
                       <div style={{ marginTop: 8 }}>
                         <span style={{ fontSize: '0.74rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 600 }}>
-                          Audit Justification Log:
+                          Evidence Audit Justification Log:
                         </span>
                         <ul className="report-ai-bullets" style={{ marginTop: 6 }}>
                           {selectedReport.aiAnalysis.reasoning.map((r, idx) => (

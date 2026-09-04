@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MapPin,
@@ -24,13 +24,16 @@ import {
   BookOpen,
   Waves,
   CheckCircle2,
-  HelpCircle
+  HelpCircle,
+  User as UserIcon,
+  LogOut
 } from 'lucide-react';
 import { useLocation } from '../hooks/useLocation';
 import { useWeather } from '../hooks/useWeather';
 import { useAlerts } from '../hooks/useAlerts';
 import { useNearbyFacilities, calculateDistance, type Facility } from '../hooks/useNearbyFacilities';
 import { useEarlyWarning } from '../hooks/useEarlyWarning';
+import { useUserAuth } from '../hooks/useUserAuth';
 import { Logo } from '../components/ui/Logo';
 import '../styles/UserHome.css';
 
@@ -39,6 +42,14 @@ type CitizenSafetyState = 'NORMAL' | 'ADVISORY' | 'WATCH' | 'WARNING' | 'EMERGEN
 export const UserHome: React.FC = () => {
   const navigate = useNavigate();
   const { location } = useLocation();
+  const { user, isAuthenticated, isGuest, hasVisitedBefore, logout } = useUserAuth();
+
+  // First-time visit entry flow: guide unauthenticated/unassigned mobile users to welcome screen
+  useEffect(() => {
+    if (!isAuthenticated && !isGuest && !hasVisitedBefore) {
+      navigate('/user/welcome', { replace: true });
+    }
+  }, [isAuthenticated, isGuest, hasVisitedBefore, navigate]);
 
   // 1. Real GPS Location Coordinates
   const lat = location.coords?.latitude ?? 20.4625;
@@ -257,15 +268,52 @@ export const UserHome: React.FC = () => {
             )}
           </button>
 
-          {/* Portal Switch */}
+          {/* Citizen Account / Settings Button */}
           <button
             type="button"
-            onClick={() => navigate('/')}
-            className="user-switch-mode-btn"
-            title="Switch portal mode"
+            onClick={() => navigate('/user/settings')}
+            className="user-icon-btn"
+            title={isAuthenticated && user ? `Citizen: ${user.fullName}` : 'Citizen Account (Guest Mode)'}
+            aria-label="Account Settings"
+            style={{ position: 'relative' }}
           >
-            <span>Switch</span>
+            {isAuthenticated && user ? (
+              <div
+                style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: user.avatarColor || '#10b981',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.75rem',
+                fontWeight: 700
+              }}
+            >
+              {user.fullName.charAt(0).toUpperCase()}
+            </div>
+            ) : (
+              <UserIcon size={16} />
+            )}
           </button>
+
+          {/* Citizen Log Out Option */}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate('/user/welcome');
+              }}
+              className="user-icon-btn text-rose-400 hover:text-rose-300 hover:bg-rose-500/15"
+              title="Sign Out of Citizen Account"
+              aria-label="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </header>
 
@@ -366,6 +414,21 @@ export const UserHome: React.FC = () => {
           </h2>
 
           <div className="user-quick-actions-grid">
+            <button
+              type="button"
+              onClick={() => navigate('/user/report')}
+              className="user-action-button-card btn-report-incident"
+            >
+              <div className="user-action-icon-circle">
+                <AlertTriangle size={20} />
+              </div>
+              <div className="user-action-text-area">
+                <h3 className="user-action-title">Report Incident</h3>
+                <p className="user-action-desc">Submit ground disaster report to emergency responders</p>
+              </div>
+              <ArrowRight size={16} className="text-zinc-500" />
+            </button>
+
             <button
               type="button"
               onClick={() => navigate('/user/map')}

@@ -1,0 +1,16 @@
+{
+    "model_name": "DRISHTI Disaster Report Informativeness Classifier",
+    "model_type": "TF-IDF + Logistic Regression",
+    "dataset": "CrisisMMD v2.0",
+    "task": "Informative vs Not Informative",
+    "total_clean_records": 16017,
+    "training_records": 12813,
+    "testing_records": 3204,
+    "accuracy": 0.7859,
+    "precision_informative": 0.8676,
+    "recall_informative": 0.8276,
+    "f1_informative": 0.8471,
+    "vocabulary_size": 15754,
+    "disasters": 7,
+    "random_state": 42
+}

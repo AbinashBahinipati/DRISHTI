@@ -1,5 +1,22 @@
 import { useState, useEffect } from 'react';
 
+export interface HourlyForecastItem {
+  time: string;
+  hour: string;
+  temp: number;
+  weatherCode: number;
+  precipProb?: number;
+}
+
+export interface DailyForecastItem {
+  date: string;
+  dayName: string;
+  maxTemp: number;
+  minTemp: number;
+  weatherCode: number;
+  precipProb?: number;
+}
+
 export interface WeatherData {
   temperature: number;
   feelsLike: number;
@@ -21,6 +38,8 @@ export interface WeatherData {
   source: 'Open-Meteo Global Environmental Telemetry';
   observedTimestamp: string;
   freshness: 'LIVE' | 'RECENT' | 'AGING' | 'STALE' | 'UNAVAILABLE';
+  hourlyForecast?: HourlyForecastItem[];
+  dailyForecast?: DailyForecastItem[];
   hourlyHistory?: {
     temperature: number[];
     humidity: number[];
@@ -39,14 +58,14 @@ interface WeatherState {
 // Map WMO weather codes to descriptions (subset)
 export const getWeatherDescription = (code: number) => {
   if (code === 0) return 'Clear sky';
-  if (code === 1 || code === 2 || code === 3) return 'Mainly clear, partly cloudy, and overcast';
-  if (code === 45 || code === 48) return 'Fog and depositing rime fog';
+  if (code === 1 || code === 2 || code === 3) return 'Mainly clear, partly cloudy';
+  if (code === 45 || code === 48) return 'Fog & mist';
   if (code >= 51 && code <= 55) return 'Drizzle';
   if (code >= 61 && code <= 65) return 'Rain';
   if (code >= 71 && code <= 75) return 'Snow fall';
   if (code >= 80 && code <= 82) return 'Rain showers';
   if (code >= 95) return 'Thunderstorm';
-  return 'Unknown';
+  return 'Overcast';
 };
 
 export const useWeather = (latitude?: number, longitude?: number) => {
@@ -62,8 +81,8 @@ export const useWeather = (latitude?: number, longitude?: number) => {
     const cacheKey = `drishti_weather_${lat.toFixed(2)}_${lon.toFixed(2)}`;
 
     try {
-      // Using Open-Meteo comprehensive telemetry endpoint with 24h past and 24h forecast
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,weather_code,surface_pressure,pressure_msl,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=precipitation,rain,showers,temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,precipitation_probability,cape&past_hours=24&forecast_hours=24&timezone=auto`;
+      // Open-Meteo endpoint with real-time current, 24h hourly, and 7-day daily forecast
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,weather_code,surface_pressure,pressure_msl,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=precipitation,rain,showers,temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,precipitation_probability,weather_code,cape&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&past_hours=24&forecast_hours=48&timezone=auto`;
       const response = await fetch(url, { cache: 'no-store' });
       
       if (!response.ok) {
@@ -73,6 +92,7 @@ export const useWeather = (latitude?: number, longitude?: number) => {
       const data = await response.json();
       const current = data.current;
       const hourly = data.hourly;
+      const daily = data.daily;
 
       // Real rolling 24h precipitation sum from past hourly measurements
       let real24hAccumulation = 0;
@@ -83,6 +103,45 @@ export const useWeather = (latitude?: number, longitude?: number) => {
 
         const forecastPrecip = hourly.precipitation.slice(24, 48);
         real24hForecast = forecastPrecip.reduce((sum: number, p: number) => sum + (typeof p === 'number' && p > 0 ? p : 0), 0);
+      }
+
+      // Parse next 12-24 hours forecast
+      const hourlyForecast: HourlyForecastItem[] = [];
+      if (hourly && Array.isArray(hourly.time)) {
+        const startIndex = 24; // Current/upcoming hours
+        const count = Math.min(24, hourly.time.length - startIndex);
+        for (let i = startIndex; i < startIndex + count; i++) {
+          const rawTime = hourly.time[i];
+          const d = new Date(rawTime);
+          hourlyForecast.push({
+            time: rawTime,
+            hour: d.toLocaleTimeString([], { hour: 'numeric', hour12: true }),
+            temp: Math.round(hourly.temperature_2m?.[i] ?? 0),
+            weatherCode: hourly.weather_code?.[i] ?? 0,
+            precipProb: hourly.precipitation_probability?.[i]
+          });
+        }
+      }
+
+      // Parse next 5-7 days daily forecast
+      const dailyForecast: DailyForecastItem[] = [];
+      if (daily && Array.isArray(daily.time)) {
+        for (let i = 0; i < daily.time.length; i++) {
+          const rawDate = daily.time[i];
+          const d = new Date(rawDate);
+          const isToday = i === 0;
+          const isTomorrow = i === 1;
+          const dayName = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : d.toLocaleDateString([], { weekday: 'short' });
+
+          dailyForecast.push({
+            date: rawDate,
+            dayName,
+            maxTemp: Math.round(daily.temperature_2m_max?.[i] ?? 0),
+            minTemp: Math.round(daily.temperature_2m_min?.[i] ?? 0),
+            weatherCode: daily.weather_code?.[i] ?? 0,
+            precipProb: daily.precipitation_probability_max?.[i]
+          });
+        }
       }
 
       const currentCape = hourly && Array.isArray(hourly.cape) ? hourly.cape[24] : undefined;
@@ -110,6 +169,8 @@ export const useWeather = (latitude?: number, longitude?: number) => {
         source: 'Open-Meteo Global Environmental Telemetry',
         observedTimestamp,
         freshness: 'LIVE',
+        hourlyForecast,
+        dailyForecast,
         hourlyHistory: hourly ? {
           temperature: Array.isArray(hourly.temperature_2m) ? hourly.temperature_2m.slice(0, 24) : [],
           humidity: Array.isArray(hourly.relative_humidity_2m) ? hourly.relative_humidity_2m.slice(0, 24) : [],

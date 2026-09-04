@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Bell, MapPin, Shield,
   Activity, AlertTriangle, Trash2,
-  Cloud, CloudOff, CheckCircle2, XCircle
+  Cloud, CloudOff, CheckCircle2, XCircle,
+  Sun, Moon, Palette, Monitor
 } from 'lucide-react';
 import { useSettings } from '../hooks/useSettings';
 import { useSystemStatus } from '../hooks/useSystemStatus';
@@ -12,14 +13,14 @@ import { useLocation } from '../hooks/useLocation';
 import { useReports } from '../hooks/useReports';
 import '../styles/Settings.css';
 
-type SettingsTab = 'identity' | 'alerts' | 'location' | 'system' | 'privacy';
+type SettingsTab = 'identity' | 'appearance' | 'alerts' | 'location' | 'system' | 'privacy';
 
 export const SettingsDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('identity');
   const [showClearModal, setShowClearModal] = useState(false);
 
-  const { settings, updateRole, updateAlertRadius, toggleAlertPreference, clearAllData } = useSettings();
+  const { settings, updateTheme, updateAlertRadius, toggleAlertPreference, clearAllData } = useSettings();
   const { isOnline, notificationPermission, requestNotificationPermission, storage, serviceWorkerActive } = useSystemStatus();
   const { location, requestLocation } = useLocation();
   const { reports } = useReports();
@@ -27,12 +28,12 @@ export const SettingsDashboard: React.FC = () => {
   const pendingReportsCount = reports.filter(r => r.status === 'PendingSync').length;
 
   const formatBytes = (bytes: number, decimals = 2) => {
-    if (!+bytes) return '0 Bytes';
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   const renderContent = () => {
@@ -41,57 +42,139 @@ export const SettingsDashboard: React.FC = () => {
         return (
           <div className="settings-section">
             <div className="section-header">
-              <h2 className="section-title">IDENTITY</h2>
-              <p className="section-desc">Manage your DRISHTI role and profile.</p>
+              <h2 className="section-title">OPERATOR & STATION IDENTITY</h2>
+              <p className="section-desc">Authorized emergency operations coordinator credentials and station parameters.</p>
             </div>
 
-            <div className="profile-card">
-              <div className="profile-avatar">
-                <User size={32} />
+            <div className="settings-card flex flex-col gap-6">
+              {/* Operator Node Profile Card */}
+              <div className="operator-profile-box">
+                <div className="operator-avatar-badge">
+                  <Shield size={28} className="text-blue-500" />
+                </div>
+                <div className="operator-profile-details">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3 className="operator-title">DRISHTI Command Node</h3>
+                    <span className="operator-status-badge">
+                      <span className="status-dot-pulse" />
+                      Authorized Operator
+                    </span>
+                  </div>
+                  <p className="operator-subtitle">
+                    Emergency Operations Center • Multi-Agency Disaster Response & Early Warning Dispatch
+                  </p>
+                </div>
               </div>
-              <div className="profile-info">
-                <h3 className="profile-name">GUEST USER</h3>
-                <span className="profile-role-badge">
-                  {settings.role === 'citizen' ? 'Affected Citizen' : 'Volunteer / Responder'}
+
+              {/* Station Parameters Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="station-param-card">
+                  <span className="station-param-label">Operational Role</span>
+                  <span className="station-param-value">Emergency Verification & Dispatch Lead</span>
+                </div>
+                <div className="station-param-card">
+                  <span className="station-param-label">Station Jurisdiction</span>
+                  <span className="station-param-value">
+                    {location.coords ? `${location.coords.latitude.toFixed(4)}°N, ${location.coords.longitude.toFixed(4)}°E` : 'Command Operations District'}
+                  </span>
+                </div>
+                <div className="station-param-card">
+                  <span className="station-param-label">Access Clearance</span>
+                  <span className="station-param-value">Level 3 Multi-Hazard Intelligence</span>
+                </div>
+                <div className="station-param-card">
+                  <span className="station-param-label">Active Network Sync</span>
+                  <span className={`station-param-value ${isOnline ? 'text-success' : 'text-warning'}`}>
+                    {isOnline ? 'Live Mesh & Cloud Telemetry' : 'Local Offline Cache Mode'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Quick Operational Navigation */}
+              <div className="border-t border-border pt-5">
+                <span className="text-xs font-bold text-text-secondary uppercase tracking-wider block mb-3">
+                  Operational Control Feeds
                 </span>
-                <p className="guest-notice">Sign in is not required for emergency access.</p>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <h3 className="section-title text-sm mb-4">YOUR ROLE</h3>
-              <div className="role-grid">
-                <div
-                  className={`role-option ${settings.role === 'citizen' ? 'selected' : ''}`}
-                  onClick={() => updateRole('citizen')}
-                >
-                  <div className="role-option-title">
-                    <User size={18} /> Affected Citizen
-                  </div>
-                  <p className="role-option-desc">Receive alerts, find help and report incidents.</p>
-                </div>
-                <div
-                  className={`role-option ${settings.role === 'volunteer' ? 'selected' : ''}`}
-                  onClick={() => updateRole('volunteer')}
-                >
-                  <div className="role-option-title">
-                    <Shield size={18} /> Volunteer / Responder
-                  </div>
-                  <p className="role-option-desc">Find incidents and coordinate assistance.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <button className="settings-btn primary" onClick={() => navigate('/app/early-warning')}>
+                    Early Warning →
+                  </button>
+                  <button className="settings-btn secondary" onClick={() => navigate('/app/reports')}>
+                    Incident Queue →
+                  </button>
+                  <button className="settings-btn secondary" onClick={() => navigate('/app/volunteer')}>
+                    Volunteer Hub →
+                  </button>
+                  <button className="settings-btn secondary" onClick={() => navigate('/app/map')}>
+                    Disaster Map →
+                  </button>
                 </div>
               </div>
             </div>
+          </div>
+        );
+      case 'appearance':
+        return (
+          <div className="settings-section">
+            <div className="section-header">
+              <h2 className="section-title">APPEARANCE & THEME</h2>
+              <p className="section-desc">Select your preferred interface theme across DRISHTI.</p>
+            </div>
 
-            <div className="mt-8 border-t border-border pt-6">
-              <h3 className="section-title text-sm mb-4">EMERGENCY ACCESS</h3>
-              <p className="text-sm text-text-secondary mb-4">Critical emergency features remain accessible without requiring a full user profile.</p>
-              <div className="flex gap-4">
-                <button className="settings-btn primary flex-1" onClick={() => navigate('/app/emergency')}>
-                  Emergency Help
-                </button>
-                <button className="settings-btn secondary flex-1" onClick={() => navigate('/app/report')}>
-                  Report Incident
-                </button>
+            <div className="settings-card flex flex-col gap-4">
+              <div className="row-label mb-2">
+                <span className="row-title">Global Theme</span>
+                <span className="row-desc">Automatically synchronize with your operating system or select a manual theme.</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div
+                  className={`role-option ${settings.theme === 'system' ? 'selected' : ''}`}
+                  onClick={() => updateTheme('system')}
+                  style={{ cursor: 'pointer', padding: '16px', borderRadius: '12px' }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="role-option-title flex items-center gap-2 font-bold text-text">
+                      <Monitor size={18} className="text-blue-500" /> System Default
+                    </div>
+                    {settings.theme === 'system' && <CheckCircle2 size={18} className="text-accent" />}
+                  </div>
+                  <p className="role-option-desc text-xs text-text-secondary">
+                    Automatically adapts to your device / OS theme settings (Light or Dark).
+                  </p>
+                </div>
+
+                <div
+                  className={`role-option ${settings.theme === 'light' ? 'selected' : ''}`}
+                  onClick={() => updateTheme('light')}
+                  style={{ cursor: 'pointer', padding: '16px', borderRadius: '12px' }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="role-option-title flex items-center gap-2 font-bold text-text">
+                      <Sun size={18} className="text-amber-500" /> Light Mode
+                    </div>
+                    {settings.theme === 'light' && <CheckCircle2 size={18} className="text-accent" />}
+                  </div>
+                  <p className="role-option-desc text-xs text-text-secondary">
+                    Crisp, clean operational palette with high readability for command room daylight operations.
+                  </p>
+                </div>
+
+                <div
+                  className={`role-option ${settings.theme === 'dark' ? 'selected' : ''}`}
+                  onClick={() => updateTheme('dark')}
+                  style={{ cursor: 'pointer', padding: '16px', borderRadius: '12px' }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="role-option-title flex items-center gap-2 font-bold text-text">
+                      <Moon size={18} className="text-indigo-400" /> Dark Mode
+                    </div>
+                    {settings.theme === 'dark' && <CheckCircle2 size={18} className="text-accent" />}
+                  </div>
+                  <p className="role-option-desc text-xs text-text-secondary">
+                    Tactical dark surface theme with high-contrast indicator highlights for low-light command centers.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -377,6 +460,9 @@ export const SettingsDashboard: React.FC = () => {
         <aside className="settings-nav">
           <button className={`settings-nav-item ${activeTab === 'identity' ? 'active' : ''}`} onClick={() => setActiveTab('identity')}>
             <User size={18} /> <span>Identity</span>
+          </button>
+          <button className={`settings-nav-item ${activeTab === 'appearance' ? 'active' : ''}`} onClick={() => setActiveTab('appearance')}>
+            <Palette size={18} /> <span>Appearance</span>
           </button>
           <button className={`settings-nav-item ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>
             <Bell size={18} /> <span>Alerts</span>

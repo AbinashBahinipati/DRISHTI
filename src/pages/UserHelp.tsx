@@ -358,7 +358,7 @@ export const UserHelp: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => navigate('/app/report')}
+              onClick={() => navigate('/user/report')}
               className="user-help-report-btn"
             >
               <span>Submit Report</span>

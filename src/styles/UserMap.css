@@ -6,8 +6,9 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #07090c;
+  background-color: var(--color-bg, #f8fafc);
   overflow: hidden;
+  transition: background-color 0.2s ease;
 }
 
 /* 1. Citizen Map Header */
@@ -49,13 +50,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(11, 14, 18, 0.92);
+  background: var(--color-surface, #ffffff);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 12px;
   padding: 8px 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .user-map-back-btn {
@@ -67,16 +68,17 @@
   min-width: 36px;
   min-height: 36px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--color-bg, #f1f5f9);
+  border: 1px solid var(--color-border, #cbd5e1);
+  color: var(--color-text, #0f172a);
   cursor: pointer;
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
 .user-map-back-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--color-surface, #ffffff);
+  border-color: #10b981;
 }
 
 .user-map-header-title-wrap {
@@ -87,7 +89,7 @@
 .user-map-header-title {
   font-size: 0.88rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text, #0f172a);
   margin: 0;
   line-height: 1.1;
 }
@@ -95,7 +97,7 @@
 .user-map-location-sub {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #34d399;
+  color: #059669;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -106,7 +108,7 @@
 }
 
 .user-map-location-sub.unavailable {
-  color: #94a3b8;
+  color: var(--color-text-secondary, #64748b);
 }
 
 /* Facility Filter Pills */
@@ -136,33 +138,33 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  background: rgba(11, 14, 18, 0.92);
+  background: var(--color-surface, #ffffff);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 999px;
   padding: 8px 14px;
   min-height: 38px;
   font-size: 0.74rem;
   font-weight: 700;
-  color: #cbd5e1;
+  color: var(--color-text, #0f172a);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 }
 
 .user-filter-pill:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--color-surface-hover, #f1f5f9);
+  border-color: var(--color-border-hover, #cbd5e1);
 }
 
 .user-filter-pill.active {
   background: #10b981;
   color: #ffffff;
   border-color: #10b981;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.4);
 }
 
 /* 2. Map Viewport Container */
@@ -181,7 +183,7 @@
 
 @media (max-width: 640px) {
   .user-map-page .drishti-map-controls-container {
-    margin-top: 118px !important; /* Positions zoom & layer tool buttons cleanly below the 2-row header & filter bar on mobile */
+    margin-top: 118px !important;
     margin-right: 10px !important;
   }
 }
@@ -192,21 +194,21 @@
   top: 72px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(11, 14, 18, 0.88);
+  background: var(--color-surface, #ffffff);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 999px;
   padding: 5px 14px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #64748b);
   display: flex;
   align-items: center;
   gap: 6px;
   z-index: 30;
   pointer-events: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   animation: fadeInDown 0.3s ease-out;
   max-width: 90%;
   text-align: center;
@@ -234,13 +236,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(11, 15, 20, 0.96);
+  background: var(--color-surface, #ffffff);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(244, 63, 94, 0.6);
+  border: 1.5px solid #f43f5e;
   border-radius: 12px;
   padding: 8px 14px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   animation: fadeInDown 0.25s ease-out;
   max-width: calc(100% - 28px);
   box-sizing: border-box;
@@ -267,7 +269,7 @@
 .user-active-route-title {
   font-size: 0.82rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text, #0f172a);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -293,7 +295,7 @@
 
 .user-cancel-route-btn:hover {
   background: #f43f5e;
-  box-shadow: 0 0 14px rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.4);
 }
 
 @keyframes fadeInDown {
@@ -309,12 +311,12 @@
   right: 14px;
   max-width: 600px;
   margin: 0 auto;
-  background: #0d1116;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 18px;
   padding: 16px 18px;
   z-index: 45;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
   animation: slideUpPanel 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
@@ -349,7 +351,7 @@
 .user-assessment-location-title {
   font-size: 1rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text, #0f172a);
   margin: 0 0 2px 0;
   line-height: 1.2;
 }
@@ -357,7 +359,7 @@
 .user-assessment-coords {
   font-size: 0.72rem;
   font-family: ui-monospace, monospace;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #64748b);
   margin: 0;
 }
 
@@ -367,9 +369,9 @@
   min-width: 36px;
   min-height: 36px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
+  background: var(--color-bg, #f1f5f9);
+  border: 1px solid var(--color-border, #cbd5e1);
+  color: var(--color-text, #0f172a);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,8 +381,8 @@
 }
 
 .user-assessment-close-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  background: var(--color-surface, #ffffff);
+  border-color: #10b981;
 }
 
 /* Status Banner in Assessment */
@@ -394,21 +396,21 @@
 }
 
 .user-safety-status-banner.status-normal {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
 }
 
 .user-safety-status-banner.status-alert {
-  background: rgba(245, 158, 11, 0.18);
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #d97706;
 }
 
 .user-safety-status-banner.status-action {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #dc2626;
 }
 
 .user-safety-status-badge {
@@ -435,8 +437,8 @@
 }
 
 .user-hazard-mini-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-bg, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 10px;
   padding: 8px 10px;
   display: flex;
@@ -447,7 +449,7 @@
 .user-hazard-mini-label {
   font-size: 0.68rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--color-text-secondary, #64748b);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -456,7 +458,7 @@
 .user-hazard-mini-status {
   font-size: 0.76rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text, #0f172a);
 }
 
 /* Assessment Weather Strip */
@@ -464,12 +466,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--color-bg, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 0.74rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary, #475569);
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -482,8 +484,8 @@
 
 /* Real-Time Loading Progress State */
 .user-loading-progress-box {
-  background: #0f1318;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -494,7 +496,7 @@
 .user-loading-title {
   font-size: 0.88rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--color-text, #0f172a);
   margin: 0;
   display: flex;
   align-items: center;
@@ -506,7 +508,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.76rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary, #475569);
 }
 
 .user-loading-step-status {
@@ -515,15 +517,15 @@
 }
 
 .step-loading {
-  color: #38bdf8;
+  color: #0284c7;
 }
 
 .step-done {
-  color: #34d399;
+  color: #059669;
 }
 
 .step-fail {
-  color: #94a3b8;
+  color: var(--color-text-secondary, #64748b);
 }
 
 /* Failure Warning */
@@ -536,7 +538,7 @@
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 0.72rem;
-  color: #fbbf24;
+  color: #d97706;
 }
 
 /* Navigation Route Button */
@@ -548,7 +550,7 @@
   gap: 8px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: none;
   border-radius: 10px;
   padding: 12px 16px;
   min-height: 44px;
@@ -558,13 +560,13 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
   box-sizing: border-box;
 }
 
 .user-navigate-to-pin-btn:hover {
   background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
 }
 
 /* Assessment Footer */
@@ -573,7 +575,172 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.68rem;
-  color: #64748b;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary, #64748b);
+  border-top: 1px solid var(--color-border, #e2e8f0);
   padding-top: 8px;
+}
+
+/* ==========================================================================
+   DARK THEME OVERRIDES FOR CITIZEN MAP
+   ========================================================================== */
+[data-theme='dark'] .user-map-page {
+  background-color: #07090c;
+}
+
+[data-theme='dark'] .user-map-header-left {
+  background: rgba(11, 14, 18, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='dark'] .user-map-back-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-map-back-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme='dark'] .user-map-header-title {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-map-location-sub {
+  color: #34d399;
+}
+
+[data-theme='dark'] .user-map-location-sub.unavailable {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .user-filter-pill {
+  background: rgba(11, 14, 18, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .user-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-filter-pill.active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+[data-theme='dark'] .user-map-hint-pill {
+  background: rgba(11, 14, 18, 0.88);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] .user-active-route-banner {
+  background: rgba(11, 15, 20, 0.96);
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+}
+
+[data-theme='dark'] .user-active-route-title {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-assessment-drawer {
+  background: #0d1116;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+}
+
+[data-theme='dark'] .user-assessment-location-title {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-assessment-coords {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .user-assessment-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .user-assessment-close-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-safety-status-banner.status-normal {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+[data-theme='dark'] .user-safety-status-banner.status-alert {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .user-safety-status-banner.status-action {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+}
+
+[data-theme='dark'] .user-hazard-mini-box {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .user-hazard-mini-label {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .user-hazard-mini-status {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-assessment-weather-row {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .user-loading-progress-box {
+  background: #0f1318;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .user-loading-title {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .user-loading-step-row {
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .step-loading {
+  color: #38bdf8;
+}
+
+[data-theme='dark'] .step-done {
+  color: #34d399;
+}
+
+[data-theme='dark'] .user-data-warning-pill {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .user-assessment-footer {
+  color: #64748b;
+  border-top-color: rgba(255, 255, 255, 0.05);
 }

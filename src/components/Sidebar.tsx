@@ -6,7 +6,6 @@ import {
   Bell,
   Map,
   Activity,
-  AlertTriangle,
   FileText,
   Users,
   Settings,
@@ -28,26 +27,14 @@ interface SidebarProps {
 
 const navSections = [
   {
-    title: 'MAIN',
+    title: 'ORGANIZATION',
     items: [
       { label: 'Home', path: '/app', icon: <Home size={17} strokeWidth={2} />, exact: true },
-      { label: 'Alerts', path: '/app/alerts', icon: <Bell size={17} strokeWidth={2} />, hasBadge: true },
+      { label: 'Reports', path: '/app/reports', icon: <FileText size={17} strokeWidth={2} /> },
       { label: 'Early Warning', path: '/app/early-warning', icon: <ShieldAlert size={17} strokeWidth={2} />, hasBadge: true },
       { label: 'Disaster Map', path: '/app/map', icon: <Map size={17} strokeWidth={2} /> },
+      { label: 'Volunteer Hub', path: '/app/volunteer', icon: <Users size={17} strokeWidth={2} /> },
       { label: 'Live Telemetry', path: '/app/telemetry', icon: <Activity size={17} strokeWidth={2} /> },
-    ]
-  },
-  {
-    title: 'RESPONSE',
-    items: [
-      { label: 'Reports', path: '/app/reports', icon: <FileText size={17} strokeWidth={2} /> },
-      { label: 'Report Incident', path: '/app/report', icon: <AlertTriangle size={17} strokeWidth={2} /> },
-    ]
-  },
-  {
-    title: 'VOLUNTEER',
-    items: [
-      { label: 'Volunteer Dashboard', path: '/app/volunteer', icon: <Users size={17} strokeWidth={2} /> },
     ]
   },
   {

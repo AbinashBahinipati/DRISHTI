@@ -85,7 +85,7 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
   const valueStyle: React.CSSProperties = {
     fontSize: '1.9rem',
     fontWeight: 700,
-    color: '#ffffff',
+    color: 'var(--color-text, #ffffff)',
     lineHeight: 1,
     letterSpacing: '-0.02em',
     marginBottom: '4px'
@@ -95,46 +95,18 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '0.52rem',
-    color: '#64748b',
+    color: 'var(--color-text-muted, #64748b)',
     marginTop: '3px',
     fontWeight: 600,
     letterSpacing: '0.08em',
     textTransform: 'uppercase'
   };
 
-  const boxStyle: React.CSSProperties = {
-    backgroundColor: '#12151a',
-    border: '1px solid rgba(255, 255, 255, 0.09)',
-    borderRadius: '14px',
-    padding: 0,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column'
-  };
-
-  const headerStyle: React.CSSProperties = {
-    padding: '12px 16px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    background: 'rgba(255, 255, 255, 0.02)'
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
       {/* Live Coordinate Status Bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '6px 14px',
-        background: 'rgba(18, 21, 26, 0.75)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '10px',
-        fontSize: '0.72rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#cbd5e1' }}>
+      <div className="live-reading-glass-bar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-text, #cbd5e1)' }}>
           <MapPin size={12} className="text-orange-400" />
           <span style={{ fontWeight: 600 }}>
             {address || `${effectiveLat.toFixed(4)}°N, ${effectiveLon.toFixed(4)}°E (Bhubaneswar)`}
@@ -142,7 +114,7 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#34d399', fontWeight: 700, fontSize: '0.65rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#10b981', fontWeight: 700, fontSize: '0.65rem' }}>
             <Radio size={10} className="animate-pulse" />
             <span>REAL-TIME SENSOR FEED</span>
           </div>
@@ -153,11 +125,11 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: '6px',
-              padding: '2px 8px',
-              color: '#94a3b8',
+              padding: '3px 8px',
+              color: 'var(--color-text-secondary, #94a3b8)',
               fontSize: '0.65rem',
               cursor: 'pointer'
             }}
@@ -172,17 +144,17 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
       {/* 4 Telemetry Metrics Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px', width: '100%' }}>
         {/* 1. Temperature Card */}
-        <div style={boxStyle}>
-          <div style={headerStyle}>
-            <h3 style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Temperature</h3>
+        <div className="live-reading-glass-card">
+          <div className="live-reading-glass-header">
+            <h3 style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Temperature</h3>
             <Thermometer size={13} className="text-orange-400" />
           </div>
           <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div style={valueStyle}>
               {weather?.temperature !== undefined ? `${weather.temperature.toFixed(1)}°C` : loading ? '...' : '--'}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginBottom: '6px' }}>
-              Feels like: <strong style={{ color: '#e2e8f0' }}>{weather?.feelsLike !== undefined ? `${weather.feelsLike.toFixed(1)}°C` : '--'}</strong>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', marginBottom: '6px' }}>
+              Feels like: <strong style={{ color: 'var(--color-text, #e2e8f0)' }}>{weather?.feelsLike !== undefined ? `${weather.feelsLike.toFixed(1)}°C` : '--'}</strong>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
               <Sparkline data={tempData} color="#f97316" height={44} />
@@ -194,17 +166,17 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
         </div>
 
         {/* 2. Humidity Card */}
-        <div style={boxStyle}>
-          <div style={headerStyle}>
-            <h3 style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Humidity</h3>
+        <div className="live-reading-glass-card">
+          <div className="live-reading-glass-header">
+            <h3 style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Humidity</h3>
             <Droplets size={13} className="text-sky-400" />
           </div>
           <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div style={valueStyle}>
               {weather?.humidity !== undefined ? `${weather.humidity}%` : loading ? '...' : '--'}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginBottom: '6px' }}>
-              Pressure: <strong style={{ color: '#e2e8f0' }}>{weather?.surfacePressure !== undefined ? `${weather.surfacePressure.toFixed(0)} hPa` : '--'}</strong>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', marginBottom: '6px' }}>
+              Pressure: <strong style={{ color: 'var(--color-text, #e2e8f0)' }}>{weather?.surfacePressure !== undefined ? `${weather.surfacePressure.toFixed(0)} hPa` : '--'}</strong>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
               <Sparkline data={humData} color="#38bdf8" height={44} />
@@ -216,17 +188,17 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
         </div>
 
         {/* 3. Precipitation Card */}
-        <div style={boxStyle}>
-          <div style={headerStyle}>
-            <h3 style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Precipitation</h3>
+        <div className="live-reading-glass-card">
+          <div className="live-reading-glass-header">
+            <h3 style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Precipitation</h3>
             <CloudRain size={13} className="text-emerald-400" />
           </div>
           <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div style={valueStyle}>
               {weather?.precipitation !== undefined ? `${weather.precipitation.toFixed(1)} mm` : loading ? '...' : '--'}
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginBottom: '6px' }}>
-              24h Total: <strong style={{ color: '#e2e8f0' }}>{weather?.precipitationAccumulation24h !== undefined ? `${weather.precipitationAccumulation24h.toFixed(1)} mm` : '0.0 mm'}</strong>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', marginBottom: '6px' }}>
+              24h Total: <strong style={{ color: 'var(--color-text, #e2e8f0)' }}>{weather?.precipitationAccumulation24h !== undefined ? `${weather.precipitationAccumulation24h.toFixed(1)} mm` : '0.0 mm'}</strong>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
               <Sparkline data={precipData} color="#10b981" height={44} />
@@ -238,20 +210,20 @@ export const LiveReadingsCard: React.FC<LiveReadingsCardProps> = ({ latitude, lo
         </div>
 
         {/* 4. Wind Velocity Card */}
-        <div style={boxStyle}>
-          <div style={headerStyle}>
-            <h3 style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Wind Velocity</h3>
+        <div className="live-reading-glass-card">
+          <div className="live-reading-glass-header">
+            <h3 style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0, lineHeight: 1 }}>Wind Velocity</h3>
             <Wind size={13} className="text-amber-400" />
           </div>
           <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div style={valueStyle}>
-              {weather?.windSpeed !== undefined ? `${weather.windSpeed.toFixed(1)}` : loading ? '...' : '--'} <span style={{ fontSize: '0.95rem', color: '#94a3b8', fontWeight: 500 }}>km/h</span>
+              {weather?.windSpeed !== undefined ? `${weather.windSpeed.toFixed(1)}` : loading ? '...' : '--'} <span style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary, #94a3b8)', fontWeight: 500 }}>km/h</span>
             </div>
-            <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginBottom: '6px' }}>
-              Direction: <strong style={{ color: '#e2e8f0' }}>{weather?.windDirection !== undefined ? `${weather.windDirection}°` : '--'}</strong>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-secondary, #94a3b8)', marginBottom: '6px' }}>
+              Direction: <strong style={{ color: 'var(--color-text, #e2e8f0)' }}>{weather?.windDirection !== undefined ? `${weather.windDirection}°` : '--'}</strong>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', padding: '8px', marginTop: '6px' }}>
-              <div style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: 600 }}>
+            <div className="live-reading-gust-box">
+              <div style={{ fontSize: '0.72rem', color: 'var(--color-text, #cbd5e1)', fontWeight: 600 }}>
                 {weather?.windGusts !== undefined ? `Gusts: ${weather.windGusts.toFixed(1)} km/h` : 'Calm Conditions'}
               </div>
             </div>
