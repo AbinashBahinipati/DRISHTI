@@ -27,6 +27,24 @@
   gap: var(--spacing-xl);
 }
 
+.telemetry-panel-readings {
+  width: 100%;
+}
+
+.telemetry-panel-feed {
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-panel-radar {
+  width: 100%;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
 .telemetry-panel-small {
   height: 250px;
   width: 100%;
@@ -37,9 +55,98 @@
   width: 100%;
 }
 
+/* Glassmorphism Styles for Live Readings Cards */
+.live-reading-glass-card {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
+}
+
+[data-theme='light'] .live-reading-glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+.live-reading-glass-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='light'] .live-reading-glass-card:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 12px 28px -4px rgba(37, 99, 235, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 1);
+}
+
+.live-reading-glass-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='light'] .live-reading-glass-header {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+  background: rgba(248, 250, 252, 0.65);
+}
+
+.live-reading-glass-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+[data-theme='light'] .live-reading-glass-bar {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.live-reading-gust-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+[data-theme='light'] .live-reading-gust-box {
+  background: rgba(241, 245, 249, 0.7);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
 @media (max-width: 768px) {
   .telemetry-panel-small,
-  .telemetry-panel-large {
+  .telemetry-panel-large,
+  .telemetry-panel-feed,
+  .telemetry-panel-radar {
     height: auto;
     min-height: 250px;
   }

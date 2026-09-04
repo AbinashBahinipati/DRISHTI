@@ -1,0 +1,285 @@
+/* ==========================================================================
+   DRISHTI ORGANIZATION COMMAND CENTER LOGIN STYLES
+   ========================================================================== */
+
+.org-login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg, #0b0f17);
+  color: var(--color-text, #f8fafc);
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+  font-family: var(--font-primary);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Ambient Visual Depth */
+.org-login-bg-glow {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.org-login-wrapper {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  margin: auto 0;
+}
+
+/* Header & Branding */
+.org-login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.75rem;
+  width: 100%;
+}
+
+.org-login-badge-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.25) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f97316;
+  margin-bottom: 0.875rem;
+  box-shadow: 0 4px 20px -4px rgba(249, 115, 22, 0.3);
+}
+
+.org-login-brand-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--color-text, #f8fafc);
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.org-login-page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text, #f8fafc);
+  margin: 0.25rem 0 0.25rem 0;
+  letter-spacing: -0.015em;
+}
+
+.org-login-subtitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #94a3b8);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Card Container */
+.org-login-card {
+  width: 100%;
+  background-color: var(--color-surface, #121926);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  border-radius: 18px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+/* Error Banner */
+.org-login-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: #ef4444;
+  font-size: 0.825rem;
+  line-height: 1.4;
+  margin-bottom: 1.25rem;
+}
+
+.org-login-error-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Form Layout */
+.org-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  width: 100%;
+}
+
+.org-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.org-form-label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.org-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.org-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--color-text-muted, #64748b);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.org-form-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 1rem 0 2.5rem;
+  background-color: var(--color-surface-subtle, #0e1420);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 10px;
+  color: var(--color-text, #f8fafc);
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.org-form-input::placeholder {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.85rem;
+}
+
+.org-form-input:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+.org-form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Submit Button */
+.org-login-btn {
+  width: 100%;
+  height: 48px;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.925rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px -2px rgba(234, 88, 12, 0.4);
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.org-login-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px -2px rgba(234, 88, 12, 0.55);
+}
+
+.org-login-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.org-login-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Security Notice Box Inside Card */
+.org-security-notice {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  text-align: left;
+}
+
+.org-security-notice-icon {
+  color: var(--color-text-muted, #64748b);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.org-security-notice-text {
+  font-size: 0.775rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.org-security-notice-text strong {
+  color: var(--color-text, #f8fafc);
+}
+
+/* Secondary Citizen Portal Switcher */
+.org-switch-portal {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.org-switch-portal-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary, #94a3b8);
+  font-size: 0.825rem;
+  font-weight: 500;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.org-switch-portal-btn:hover {
+  color: var(--color-text, #f8fafc);
+  background-color: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Menu, ShieldCheck, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Tooltip } from './ui/Tooltip';
 import { useLocation as useGeoLocation } from '../hooks/useLocation';
+import { useOrgAuth } from '../hooks/useOrgAuth';
 import '../styles/TopBar.css';
 
 interface TopBarProps {
@@ -12,7 +13,9 @@ interface TopBarProps {
 
 const TopBar: React.FC<TopBarProps> = ({ onMobileMenuClick }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { location: geoLocation } = useGeoLocation();
+  const { isAuthenticated: isOrgAuth, logout: orgLogout } = useOrgAuth();
   const [activeMapFilter, setActiveMapFilter] = useState('all');
   const [navState, setNavState] = useState<{ isNavigating: boolean; destinationTitle?: string }>({ isNavigating: false });
 
@@ -138,13 +141,39 @@ const TopBar: React.FC<TopBarProps> = ({ onMobileMenuClick }) => {
         )}
       </div>
 
-      <div className="topbar-right">
+      <div className="topbar-right flex items-center gap-3">
         {!isHome && (
           <div className={`flex items-center gap-2 text-xs font-semibold ${geoLocation.coords ? 'text-success' : 'text-danger'}`}>
             <div className="w-2 h-2 rounded-full bg-current" />
             {geoLocation.address ? geoLocation.address : geoLocation.coords ? 'Location detected' : 'Location unavailable'}
           </div>
         )}
+
+        <div className="flex items-center gap-2.5 ml-auto">
+          {/* Operator Status Badge */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <ShieldCheck size={14} className="text-emerald-400" />
+            <span className="font-semibold tracking-wide">
+              {isOrgAuth ? 'Command Center' : 'System Operator'}
+            </span>
+          </div>
+
+          {/* Top-Right Log Out Button */}
+          <button
+            type="button"
+            onClick={() => {
+              orgLogout();
+              navigate('/organization-login', { replace: true });
+            }}
+            className="px-3.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 hover:border-rose-500/60 text-rose-300 hover:text-rose-100 text-xs font-bold flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
+            title="Log Out of Organization Command Center"
+            aria-label="Log Out of Organization Command Center"
+          >
+            <LogOut size={14} strokeWidth={2.2} className="text-rose-400" />
+            <span>Log Out</span>
+          </button>
+        </div>
       </div>
     </header>
   );

@@ -8,16 +8,17 @@
   position: sticky;
   top: 0;
   z-index: 90;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .topbar.topbar-home {
-  display: none;
+  display: flex;
 }
 
 @media (max-width: 768px) {
-  .topbar.topbar-home {
-    display: flex;
-    height: 48px;
+  .topbar {
+    height: 52px;
     padding: 0 12px;
   }
 }

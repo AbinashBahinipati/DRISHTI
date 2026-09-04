@@ -242,12 +242,16 @@ export async function fetchLiveIncidentReports(lat = 20.4625, lon = 85.8828): Pr
     const reportType: ReportType = alert.type === 'Earthquake' ? 'Earthquake' : alert.type === 'Flood' ? 'Flood' : 'Other';
     const urgency: ReportUrgency = 'Critical';
     
+    // Store the exact live telemetry source from alert.source (e.g. 'USGS Global Seismic Telemetry Feed')
+    const directSourceName = alert.source || (alert.type === 'Earthquake' ? 'Live USGS Seismic Feed' : 'Live Environmental Telemetry Feed');
+
     const sourceInfo: ReportSourceInfo = {
       platform: 'GDACS Global Alert',
-      authorName: 'Automated Seismic & Weather Station Network',
-      authorHandle: '@drishti_sensor_mesh',
+      authorName: directSourceName,
+      authorHandle: alert.id.startsWith('usgs-') ? '@usgs_seismic' : '@drishti_sensor_mesh',
       verifiedUser: true,
-      engagementStats: { shares: 18, corroborations: 8 }
+      engagementStats: { shares: 18, corroborations: 8 },
+      directSourceName
     };
 
     const alertLat = alert.latitude ?? lat;
@@ -266,6 +270,7 @@ export async function fetchLiveIncidentReports(lat = 20.4625, lon = 85.8828): Pr
 
     liveReports.push({
       id: `LIVE-${alert.id}`,
+      origin: 'direct_source',
       type: reportType,
       locationName: alert.location,
       coordinates: { latitude: alertLat, longitude: alertLon },
@@ -274,8 +279,8 @@ export async function fetchLiveIncidentReports(lat = 20.4625, lon = 85.8828): Pr
       urgency,
       peopleAffected: 'Immediate Sector Warning',
       tags: ['Live Sensor Telemetry', alert.type, 'Real-time Feed'],
-      status: 'Verified',
-      verificationStatus: 'Verified',
+      status: 'Submitted',
+      verificationStatus: 'UnderReview',
       responseStatus: 'EnRoute',
       assignedResponder: 'ODRAF / Disaster Rapid Response Unit',
       timestamp: alert.detectedAt,

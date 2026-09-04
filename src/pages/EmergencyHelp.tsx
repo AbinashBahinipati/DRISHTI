@@ -92,13 +92,10 @@ export const EmergencyHelp: React.FC = () => {
   );
 
   const handleQuickAssist = (option: typeof QUICK_ASSIST_OPTIONS[0]) => {
-    navigate('/app/report', {
+    navigate('/app/reports', {
       state: {
-        prefill: {
-          type: option.type,
-          urgency: option.urgency,
-          description: option.description
-        }
+        filterType: option.type,
+        filterUrgency: option.urgency
       }
     });
   };
@@ -346,14 +343,14 @@ export const EmergencyHelp: React.FC = () => {
           )}
         </section>
 
-        {/* Right Column: NEED HELP? */}
+        {/* Right Column: RESPONSE QUEUE */}
         <section className="need-help-column" aria-label="Quick Emergency Assistance">
           <div className="need-help-header">
             <div className="flex items-center gap-2">
               <Radio size={16} className="text-amber-500" />
-              <h2 className="need-help-heading">NEED HELP?</h2>
+              <h2 className="need-help-heading">RESPONSE QUEUE</h2>
             </div>
-            <p className="need-help-sub">Select an option to quickly generate an emergency report for responders.</p>
+            <p className="need-help-sub">Quickly inspect incoming ground reports filtered by urgency and hazard category.</p>
           </div>
 
           <div className="quick-assist-list">

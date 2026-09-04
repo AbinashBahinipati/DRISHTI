@@ -1,9 +1,9 @@
-/* Sidebar.css - Mastercrafted Dark Tactical Sidebar */
+/* Sidebar.css - Clean Operational Command Center Sidebar */
 
 .sidebar {
   width: 236px;
-  background: #0a0c0f;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   height: 100%;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 .sidebar.collapsed {
@@ -26,7 +26,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 14px 0 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
@@ -39,16 +39,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
   transition: transform 0.2s ease;
 }
 
 .sidebar-brand {
   font-weight: 800;
-  letter-spacing: 0.12em;
-  color: #ffffff;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
   font-size: 1.05rem;
-  margin-left: 14px;
+  margin-left: 12px;
 }
 
 /* Collapse Toggle Button */
@@ -56,9 +55,9 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #71717a;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,10 +66,9 @@
 }
 
 .sidebar-collapse-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+  background: var(--color-surface-subtle);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
   transform: scale(1.05);
 }
 
@@ -94,12 +92,12 @@
 }
 
 .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.35);
+  background: var(--color-accent);
 }
 
 /* Section Title */
@@ -110,11 +108,10 @@
 
 .sidebar-section-title {
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #ea580c;
-  opacity: 0.9;
+  color: var(--color-text-muted);
   padding: 0 8px;
   margin-bottom: 4px;
   user-select: none;
@@ -138,8 +135,8 @@
   height: 38px;
   min-height: 38px;
   padding: 0 10px;
-  border-radius: 7px;
-  color: #a1a1aa;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
   transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   text-decoration: none;
@@ -160,7 +157,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a1a1aa;
+  color: var(--color-text-secondary);
   transition: color 0.15s ease, transform 0.15s ease;
   flex-shrink: 0;
 }
@@ -172,15 +169,15 @@
 .sidebar-item-label {
   white-space: nowrap;
   font-size: 0.84rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.01em;
   flex: 1;
 }
 
 /* Hover State */
 .sidebar-item:hover {
-  color: #f4f4f5;
-  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  background-color: var(--color-surface-hover);
 }
 
 .sidebar:not(.collapsed) .sidebar-item:hover {
@@ -188,28 +185,26 @@
 }
 
 .sidebar-item:hover .sidebar-icon {
-  color: #ffffff;
+  color: var(--color-text);
 }
 
-/* Active State (Tactical Inset Glass Pill) */
+/* Active State (Clean Operational Blue Accent) */
 .sidebar-item.active {
-  color: #f59e0b !important;
-  font-weight: 600;
+  color: var(--color-accent) !important;
+  font-weight: 700;
 }
 
 .sidebar-item.active .sidebar-icon {
-  color: #f59e0b !important;
-  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));
+  color: var(--color-accent) !important;
 }
 
 .sidebar-active-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.03) 100%);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  border-left: 2.5px solid #f59e0b;
-  border-radius: 7px;
-  box-shadow: inset 0 0 10px rgba(245, 158, 11, 0.08);
+  background: var(--color-accent-glow);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 8px;
   z-index: 0;
 }
 
@@ -250,7 +245,7 @@
 /* Footer / Emergency Helpline Card */
 .sidebar-footer {
   padding: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
@@ -258,8 +253,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.12) 0%, rgba(18, 10, 10, 0.95) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.22);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 10px;
   padding: 10px 12px;
   min-height: 44px;
@@ -270,9 +265,9 @@
 }
 
 .emergency-helpline-card:hover {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.18) 0%, rgba(28, 12, 12, 0.98) 100%);
+  background: rgba(239, 68, 68, 0.14);
   border-color: rgba(239, 68, 68, 0.4);
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.22);
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.15);
   transform: translateY(-1px);
 }
 
@@ -286,13 +281,13 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.25);
+  color: #ef4444;
 }
 
 .emergency-call-text {
@@ -303,22 +298,22 @@
 
 .emergency-call-title {
   font-size: 0.68rem;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .emergency-call-number {
   font-size: 0.84rem;
-  color: #f87171;
-  font-weight: 700;
+  color: #ef4444;
+  font-weight: 800;
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
 .emergency-call-sub {
   font-size: 0.6rem;
-  color: #71717a;
+  color: var(--color-text-muted);
   white-space: nowrap;
 }
 

@@ -30,7 +30,7 @@ export const MapControls: React.FC<MapControlsProps> = ({
         () => {
           map.locate({ setView: true, maxZoom: 16 });
         },
-        { enableHighAccuracy: true, timeout: 6000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
       );
     } else {
       map.locate({ setView: true, maxZoom: 16 });
