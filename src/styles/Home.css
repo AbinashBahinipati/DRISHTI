@@ -296,6 +296,14 @@
   align-items: center;
   gap: var(--spacing-md);
   margin-top: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .location-actions {
+    width: 100%;
+    gap: 8px;
+  }
 }
 
 .location-error {
@@ -314,10 +322,22 @@
   border: none;
   border-radius: 4px;
   padding: 8px 16px;
+  min-height: 40px;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
   transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .btn-primary {
+    min-height: 44px;
+    flex: 1;
+  }
 }
 
 .btn-primary:hover {
@@ -329,11 +349,23 @@
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  padding: 6px 12px;
+  padding: 8px 14px;
+  min-height: 40px;
   font-weight: 500;
   font-size: 0.85rem;
   cursor: pointer;
   transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .btn-outline {
+    min-height: 44px;
+    flex: 1;
+  }
 }
 
 .btn-outline:hover {

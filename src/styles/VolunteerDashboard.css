@@ -248,13 +248,24 @@
 
 /* Section 1: Volunteer Status */
 .status-toggle-btn {
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 6px 12px;
+  min-height: 36px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
   border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .status-toggle-btn {
+    min-height: 44px;
+  }
 }
 
 .status-toggle-btn.toggle-available {
@@ -427,21 +438,34 @@
 
 .filter-pills-row {
   display: flex;
-  gap: 5px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .filter-pill-btn {
   flex: 1;
-  padding: 3px 6px;
-  border-radius: 5px;
+  min-width: 60px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 6px;
   background: #161619;
   border: 1px solid rgba(255, 255, 255, 0.06);
   color: #94a3b8;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .filter-pill-btn {
+    min-height: 40px;
+  }
 }
 
 .filter-pill-btn:hover {
@@ -643,21 +667,36 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+@media (max-width: 500px) {
+  .incident-actions-row {
+    flex-wrap: wrap;
+  }
 }
 
 .incident-action-btn {
   flex: 1;
+  min-width: 80px;
+  min-height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 5px 8px;
+  padding: 6px 10px;
   border-radius: 6px;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .incident-action-btn {
+    min-height: 44px;
+  }
 }
 
 .details-btn {
@@ -816,6 +855,12 @@
   z-index: 1001;
 }
 
+@media (max-width: 600px) {
+  .response-drawer {
+    width: 100%;
+  }
+}
+
 .rd-header {
   display: flex;
   align-items: center;
@@ -823,16 +868,25 @@
   padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
+  gap: 12px;
 }
 
 .drawer-close {
   background: transparent;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #94a3b8;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
+  padding: 6px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .drawer-close:hover {
@@ -861,9 +915,10 @@
   background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
   border: none;
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 12px 16px;
+  min-height: 44px;
   color: #ffffff;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   display: flex;
@@ -873,6 +928,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  box-sizing: border-box;
 }
 
 .start-nav-btn:hover {

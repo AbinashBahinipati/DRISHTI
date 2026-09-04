@@ -80,18 +80,21 @@
 .reports-create-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   background: #ef4444;
   color: #ffffff;
   border: none;
   border-radius: 10px;
   padding: 12px 20px;
+  min-height: 44px;
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
+  box-sizing: border-box;
 }
 
 .reports-create-btn:hover {
@@ -236,14 +239,24 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.6);
   padding: 8px 16px;
+  min-height: 40px;
   border-radius: 10px;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .reports-tab-btn {
+    min-height: 44px;
+    flex: 1;
+  }
 }
 
 .reports-tab-btn:hover {
@@ -293,8 +306,18 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 8px 14px;
+  min-height: 40px;
   min-width: 280px;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .reports-search-box {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+  }
 }
 
 .reports-search-box:focus-within {
@@ -698,13 +721,21 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .report-card-actions {
+    width: 100%;
+  }
 }
 
 .report-action-btn-sm {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.8);
-  padding: 6px 12px;
+  padding: 8px 14px;
+  min-height: 38px;
   border-radius: 8px;
   font-size: 0.76rem;
   font-weight: 600;
@@ -712,7 +743,17 @@
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .report-action-btn-sm {
+    flex: 1;
+    min-height: 44px;
+    min-width: 90px;
+  }
 }
 
 .report-action-btn-sm:hover {
@@ -799,16 +840,19 @@
 
 .report-modal-close {
   background: rgba(255, 255, 255, 0.05);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.6);
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .report-modal-close:hover {
@@ -843,6 +887,12 @@
   border-radius: 12px;
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 500px) {
+  .report-modal-meta-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .report-modal-meta-item {
@@ -914,4 +964,17 @@
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .report-modal-footer {
+    flex-direction: column;
+    padding: 14px 16px;
+  }
+  .report-modal-footer button,
+  .report-modal-footer .report-action-btn-sm {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
 }

@@ -260,15 +260,17 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 16px;
+  padding: 12px 16px;
+  min-height: 44px;
   border-radius: 10px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
+  box-sizing: border-box;
 }
 
 .mode-action-btn.org-btn {
@@ -310,5 +312,14 @@
   
   .landing-container {
     padding: 24px 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .landing-container {
+    padding: 16px 12px;
+  }
+  .landing-mode-card {
+    padding: 18px 14px;
   }
 }

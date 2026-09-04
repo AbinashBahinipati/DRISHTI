@@ -574,16 +574,24 @@ export const SEEDED_REPORTS: IncidentReport[] = [
  */
 export function isGenuineReport(report: IncidentReport): boolean {
   if (!report) return false;
-  // Exclude drafts, avoids, rejected, or spam
-  if (report.status === 'Draft' || report.status === 'Avoid' || report.verificationStatus === 'Rejected') {
+  // Exclude drafts, avoids, rejected, unverified, pending sync, or submitted prior to verification
+  if (
+    report.status === 'Draft' ||
+    report.status === 'Avoid' ||
+    report.status === 'PendingSync' ||
+    report.status === 'Submitted' ||
+    report.verificationStatus === 'Rejected' ||
+    report.verificationStatus === 'Unverified' ||
+    report.verificationStatus === 'UnderReview'
+  ) {
     return false;
   }
   if (report.aiAnalysis?.verdict === 'Avoid') {
     return false;
   }
-  // Certified genuine if AI verdict is Genuine or high confidence or verified status
-  if (report.aiAnalysis?.verdict === 'Genuine') return true;
-  if (report.aiAnalysis?.confidenceLevel === 'High' && (report.aiAnalysis?.confidenceScore ?? 0) >= 75) return true;
-  if (report.verificationStatus === 'Verified' || report.status === 'Verified') return true;
+  // Certified genuine ONLY when the authorized verification workflow marks it as Verified
+  if (report.verificationStatus === 'Verified' || report.status === 'Verified') {
+    return true;
+  }
   return false;
 }

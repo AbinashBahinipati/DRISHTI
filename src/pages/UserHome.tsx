@@ -31,8 +31,6 @@ import { useWeather } from '../hooks/useWeather';
 import { useAlerts } from '../hooks/useAlerts';
 import { useNearbyFacilities, calculateDistance, type Facility } from '../hooks/useNearbyFacilities';
 import { useEarlyWarning } from '../hooks/useEarlyWarning';
-import { useCitizenNotifications } from '../hooks/useCitizenNotifications';
-import { CitizenNotificationBanner } from '../components/citizen/CitizenNotificationBanner';
 import { Logo } from '../components/ui/Logo';
 import '../styles/UserHome.css';
 
@@ -52,13 +50,6 @@ export const UserHome: React.FC = () => {
   const { alerts } = useAlerts(lat, lon);
   const { facilities, loading: facilitiesLoading } = useNearbyFacilities(lat, lon, 15);
   const { assessments, highestRisk } = useEarlyWarning(5, [lat, lon], addressName);
-
-  // 3. Smart Notifications with Alarm-Fatigue Suppression
-  const { activeNotification, dismiss: dismissNotification } = useCitizenNotifications(
-    highestRisk,
-    alerts,
-    addressName
-  );
 
   // 3. Deterministic Safety State Calculation from Existing Real-Time Risk Intelligence
   const overallRisk = assessments?.overall?.riskScore ?? highestRisk?.riskScore ?? 0;
@@ -235,12 +226,6 @@ export const UserHome: React.FC = () => {
 
   return (
     <div className="user-portal-container">
-      {/* Smart In-App Notification Toast */}
-      <CitizenNotificationBanner
-        notification={activeNotification}
-        onDismiss={dismissNotification}
-      />
-
       {/* 1. Header */}
       <header className="user-portal-header">
         <div className="user-header-brand">
