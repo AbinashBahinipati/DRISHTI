@@ -24,6 +24,12 @@
   pointer-events: none;
 }
 
+@media (min-width: 641px) {
+  .user-map-header {
+    right: 80px; /* Prevents filter pills from touching or overlapping top-right map controls */
+  }
+}
+
 @media (max-width: 640px) {
   .user-map-header {
     flex-direction: column;
@@ -56,14 +62,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
   cursor: pointer;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .user-map-back-btn:hover {
@@ -107,7 +116,7 @@
   gap: 6px;
   overflow-x: auto;
   max-width: 50vw;
-  padding: 2px;
+  padding: 4px 2px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -125,20 +134,23 @@
 .user-filter-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   background: rgba(11, 14, 18, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.72rem;
+  padding: 8px 14px;
+  min-height: 38px;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #cbd5e1;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
 .user-filter-pill:hover {
@@ -159,6 +171,19 @@
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+/* Ensure Leaflet controls sit cleanly below the header and filter pills on UserMap */
+.user-map-page .drishti-map-controls-container {
+  margin-top: 14px !important;
+  z-index: 35 !important;
+}
+
+@media (max-width: 640px) {
+  .user-map-page .drishti-map-controls-container {
+    margin-top: 118px !important; /* Positions zoom & layer tool buttons cleanly below the 2-row header & filter bar on mobile */
+    margin-right: 10px !important;
+  }
 }
 
 /* 3. Tap to Assess Hint Pill */
@@ -190,10 +215,85 @@
 
 @media (max-width: 640px) {
   .user-map-hint-pill {
-    top: 108px;
+    top: 118px;
+    left: 10px;
+    transform: none;
+    max-width: calc(100% - 70px);
     font-size: 0.68rem;
     padding: 4px 10px;
   }
+}
+
+/* 3.1 Active Navigation Route Top Banner */
+.user-active-route-banner {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(11, 15, 20, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(244, 63, 94, 0.6);
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  animation: fadeInDown 0.25s ease-out;
+  max-width: calc(100% - 28px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .user-active-route-banner {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    max-width: calc(100% - 20px);
+    justify-content: space-between;
+  }
+}
+
+.user-active-route-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.user-active-route-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-cancel-route-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.user-cancel-route-btn:hover {
+  background: #f43f5e;
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.6);
 }
 
 @keyframes fadeInDown {
@@ -262,8 +362,10 @@
 }
 
 .user-assessment-close-btn {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -273,6 +375,7 @@
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
+  transition: all 0.15s ease;
 }
 
 .user-assessment-close-btn:hover {
@@ -447,14 +550,16 @@
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.78rem;
+  padding: 12px 16px;
+  min-height: 44px;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  box-sizing: border-box;
 }
 
 .user-navigate-to-pin-btn:hover {
@@ -471,14 +576,4 @@
   color: #64748b;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   padding-top: 8px;
-}
-
-@media (max-width: 600px) {
-  .user-map-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .user-map-filter-bar {
-    max-width: 100%;
-  }
 }

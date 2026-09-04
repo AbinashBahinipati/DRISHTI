@@ -102,8 +102,10 @@
 }
 
 .lap-btn-icon {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -429,8 +431,9 @@
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 0.72rem;
+  padding: 11px 14px;
+  min-height: 44px;
+  font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   display: flex;
@@ -440,6 +443,7 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 .lap-action-btn:hover {
@@ -455,12 +459,12 @@
 /* Mobile Responsiveness */
 @media (max-width: 640px) {
   .location-assessment-panel {
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
     width: auto;
     max-width: none;
-    max-height: 50vh;
+    max-height: 55vh;
     padding: 12px;
   }
 

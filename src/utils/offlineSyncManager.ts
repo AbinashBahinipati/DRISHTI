@@ -70,10 +70,11 @@ class OfflineSyncManager {
           // Simulate / Execute backend synchronization
           if (item.action === 'CREATE_REPORT') {
             const report = item.payload as IncidentReport;
-            // Update local report status from PendingSync to Submitted/Verified
+            // Transition status strictly from PendingSync -> Submitted (NEVER automatically Verified)
             const updatedReport: IncidentReport = {
               ...report,
-              status: report.status === 'PendingSync' ? 'Submitted' : report.status
+              status: 'Submitted',
+              verificationStatus: 'UnderReview'
             };
             await dbPut('reports', updatedReport);
           }

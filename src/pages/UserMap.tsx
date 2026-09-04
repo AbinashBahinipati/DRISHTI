@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Polyline } from 'react-leaflet';
 import {
   MapPin,
   ArrowLeft,
@@ -30,13 +29,10 @@ import {
 import { useLocation } from '../hooks/useLocation';
 import { useNearbyFacilities, calculateDistance } from '../hooks/useNearbyFacilities';
 import { useLocationAssessment } from '../hooks/useLocationAssessment';
-import { useAlerts } from '../hooks/useAlerts';
-import { useEarlyWarning } from '../hooks/useEarlyWarning';
-import { useCitizenNotifications } from '../hooks/useCitizenNotifications';
-import { CitizenNotificationBanner } from '../components/citizen/CitizenNotificationBanner';
 import { InteractiveMap } from '../components/map/InteractiveMap';
 import { MapMarker } from '../components/map/MapMarker';
 import { MapPopup } from '../components/map/MapPopup';
+import { MapRouting } from '../components/map/MapRouting';
 import '../styles/UserMap.css';
 
 export const UserMap: React.FC = () => {
@@ -48,24 +44,17 @@ export const UserMap: React.FC = () => {
   
   // Navigation route target state
   const [routeTarget, setRouteTarget] = useState<[number, number] | null>(null);
+  const [routeTitle, setRouteTitle] = useState<string>('');
 
   // 1. Real GPS User Coordinates
   const hasUserCoords = !!(location.coords && typeof location.coords.latitude === 'number' && typeof location.coords.longitude === 'number');
   const userLat = location.coords?.latitude ?? 20.4625;
   const userLon = location.coords?.longitude ?? 85.8828;
   const userAddress = location.address || (hasUserCoords ? `${userLat.toFixed(3)}°N, ${userLon.toFixed(3)}°E` : null);
+  const mapCenter = useMemo<[number, number]>(() => [userLat, userLon], [userLat, userLon]);
 
   // 2. Real Facilities (OSM Overpass)
   const { facilities } = useNearbyFacilities(userLat, userLon, 15);
-
-  // 3. Alerts & Early Warning for Smart Notifications
-  const { alerts } = useAlerts(userLat, userLon);
-  const { highestRisk } = useEarlyWarning(5, [userLat, userLon], userAddress || 'Bhubaneswar, Odisha');
-  const { activeNotification, dismiss: dismissNotification } = useCitizenNotifications(
-    highestRisk,
-    alerts,
-    userAddress || 'Local Corridor'
-  );
 
   // 3. Location Assessment Hook
   const {
@@ -76,15 +65,27 @@ export const UserMap: React.FC = () => {
     clearAssessment
   } = useLocationAssessment();
 
-  // Handle map tap to assess
-  const handleMapClick = (lat: number, lng: number) => {
+  // Handle map double-click to pinpoint & assess safety
+  const handleMapDoubleClick = (lat: number, lng: number) => {
     assessLocation(lat, lng);
+  };
+
+  // Start real turn-by-turn road navigation
+  const handleStartNavigation = (targetCoords: [number, number], title?: string) => {
+    setRouteTarget(targetCoords);
+    setRouteTitle(title || assessmentResult?.locationName || 'Pinpoint Location');
+    clearAssessment();
+  };
+
+  // Close active navigation route
+  const handleCloseNavigation = () => {
+    setRouteTarget(null);
+    setRouteTitle('');
   };
 
   // Close assessment drawer
   const handleCloseAssessment = () => {
     clearAssessment();
-    setRouteTarget(null);
   };
 
   // Filter facilities
@@ -159,12 +160,6 @@ export const UserMap: React.FC = () => {
 
   return (
     <div className="user-map-page">
-      {/* Smart In-App Notification Toast */}
-      <CitizenNotificationBanner
-        notification={activeNotification}
-        onDismiss={dismissNotification}
-      />
-
       {/* 1. Header */}
       <header className="user-map-header">
         <div className="user-map-header-left">
@@ -235,18 +230,41 @@ export const UserMap: React.FC = () => {
 
       {/* 2. Interactive Map Container */}
       <div className="user-map-canvas-container">
-        {!selectedCoords && (
+        {/* Floating Active Navigation Top Banner */}
+        {routeTarget && (
+          <div className="user-active-route-banner">
+            <div className="user-active-route-info">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              </span>
+              <span className="user-active-route-title">
+                Route to {routeTitle ? `Pinpoint: ${routeTitle}` : 'Selected Destination'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCloseNavigation}
+              className="user-cancel-route-btn"
+              title="Cancel Navigation Route"
+            >
+              <X size={14} />
+              <span>Cancel Navigation</span>
+            </button>
+          </div>
+        )}
+
+        {!selectedCoords && !routeTarget && (
           <div className="user-map-hint-pill">
             <Compass size={13} className="text-emerald-400 animate-spin-slow" />
-            <span>Tap anywhere on the map to assess location safety</span>
+            <span>Double-click anywhere on the map to assess location safety</span>
           </div>
         )}
 
         <InteractiveMap
-          center={[userLat, userLon]}
+          center={mapCenter}
           zoom={13}
-          onMapClick={handleMapClick}
-          onMapDoubleClick={handleMapClick}
+          onMapDoubleClick={handleMapDoubleClick}
         >
           {/* User's GPS Location Pin */}
           {hasUserCoords && (
@@ -300,22 +318,20 @@ export const UserMap: React.FC = () => {
               pulse={true}
             >
               <MapPopup
-                title="Route Destination"
+                title={routeTitle ? `Destination: ${routeTitle}` : "Route Destination"}
                 type="NAVIGATION TARGET"
               />
             </MapMarker>
           )}
 
-          {/* Road Navigation Route Line to Pinpoint */}
+          {/* Real Turn-by-Turn Road Navigation Route to Pinpoint / Facility */}
           {routeTarget && hasUserCoords && (
-            <Polyline
-              positions={[[userLat, userLon], routeTarget]}
-              pathOptions={{
-                color: '#10b981',
-                weight: 5,
-                opacity: 0.85,
-                dashArray: '8, 8'
-              }}
+            <MapRouting
+              start={[userLat, userLon]}
+              end={routeTarget}
+              destinationTitle={routeTitle ? `Pinpoint: ${routeTitle}` : 'Route Destination'}
+              urgency="Medium"
+              onClose={handleCloseNavigation}
             />
           )}
 
@@ -342,7 +358,7 @@ export const UserMap: React.FC = () => {
                     ...(f.phone ? [{ label: 'Phone', value: f.phone }] : [])
                   ]}
                   actionLabel="NAVIGATE HERE"
-                  onNavigate={() => setRouteTarget([f.lat, f.lon])}
+                  onNavigate={() => handleStartNavigation([f.lat, f.lon], f.name)}
                 />
               </MapMarker>
             );
@@ -504,7 +520,7 @@ export const UserMap: React.FC = () => {
               {hasUserCoords && (
                 <button
                   type="button"
-                  onClick={() => setRouteTarget([selectedCoords.latitude, selectedCoords.longitude])}
+                  onClick={() => handleStartNavigation([selectedCoords.latitude, selectedCoords.longitude], assessmentResult.locationName)}
                   className="user-navigate-to-pin-btn"
                 >
                   <Navigation size={14} />

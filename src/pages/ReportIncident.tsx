@@ -139,12 +139,12 @@ export const ReportIncident: React.FC = () => {
             <CheckCircle2 size={32} />
           </div>
           <h2 className="success-title">
-            {submittedReport.status === 'PendingSync' ? 'Report Saved Offline' : 'Incident Report Received & Analyzed'}
+            {submittedReport.status === 'PendingSync' ? 'Report Saved Offline' : 'Incident Report Submitted'}
           </h2>
           <p className="success-desc">
             {submittedReport.status === 'PendingSync' 
               ? 'Report saved locally in IndexedDB. Waiting for connection to synchronize with regional dispatch.'
-              : 'Your report has been ingested and audited by the DRISHTI AI Verification Agent.'}
+              : 'Your report has been submitted to the emergency network and queued for official verification.'}
           </p>
 
           {/* AI Assessment Banner on Success */}
@@ -165,9 +165,9 @@ export const ReportIncident: React.FC = () => {
                 fontWeight: 700,
                 color: verdict === 'Genuine' ? '#22c55e' : verdict === 'Avoid' ? '#ef4444' : '#f97316'
               }}>
-                🤖 AI VERDICT: {verdict === 'Genuine' ? 'HIGH CONFIDENCE (GENUINE)' : verdict === 'Avoid' ? 'AVOID (SUSPECTED FALSE/SPAM)' : 'MEDIUM CONFIDENCE (INVESTIGATING)'}
+                🤖 PRELIMINARY AI AUDIT: {verdict === 'Genuine' ? 'HIGH CONFIDENCE (GENUINE EVIDENCE)' : verdict === 'Avoid' ? 'AVOID (SUSPECTED FALSE/SPAM)' : 'MEDIUM CONFIDENCE (INVESTIGATING)'}
               </span>
-              <span style={{ fontSize: '0.78rem', color: '#fff', fontWeight: 600 }}>Confidence: {score}%</span>
+              <span style={{ fontSize: '0.78rem', color: '#fff', fontWeight: 600 }}>Score: {score}%</span>
             </div>
             {analysis?.reasoning?.[0] && (
               <p style={{ margin: 0, fontSize: '0.76rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.4 }}>
@@ -191,8 +191,8 @@ export const ReportIncident: React.FC = () => {
             </div>
             <div className="meta-row">
               <span className="meta-label">Status</span>
-              <span className="meta-value" style={{ color: submittedReport.status === 'PendingSync' ? '#f59e0b' : verdict === 'Genuine' ? '#22c55e' : verdict === 'Avoid' ? '#ef4444' : '#f97316' }}>
-                {submittedReport.status === 'PendingSync' ? 'SAVED OFFLINE (PENDING SYNC)' : submittedReport.status.toUpperCase()}
+              <span className="meta-value" style={{ color: submittedReport.status === 'PendingSync' ? '#f59e0b' : submittedReport.status === 'Submitted' ? '#38bdf8' : verdict === 'Genuine' ? '#22c55e' : '#ef4444' }}>
+                {submittedReport.status === 'PendingSync' ? 'SAVED OFFLINE (PENDING SYNC)' : submittedReport.status === 'Submitted' ? 'SUBMITTED (UNDER REVIEW)' : submittedReport.status.toUpperCase()}
               </span>
             </div>
           </div>

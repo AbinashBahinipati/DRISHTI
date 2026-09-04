@@ -27,7 +27,7 @@ export const OfflineStatusBar: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -24 }}
           transition={{ duration: 0.2 }}
-          className="w-full sticky top-0 z-50 px-4 py-2 flex items-center justify-between text-xs border-b shadow-md backdrop-blur-md"
+          className="w-full sticky top-0 z-50 px-3 py-2 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs border-b shadow-md backdrop-blur-md"
           style={{
             backgroundColor: isOffline 
               ? 'rgba(234, 88, 12, 0.92)' 
@@ -42,7 +42,7 @@ export const OfflineStatusBar: React.FC = () => {
             color: '#ffffff'
           }}
         >
-          <div className="flex items-center gap-2 max-w-full overflow-hidden">
+          <div className="flex items-center gap-2 max-w-full overflow-hidden flex-1 min-w-0">
             {isOffline ? (
               <span className="p-1 rounded bg-black/20 text-white flex-shrink-0">
                 <WifiOff size={14} />
@@ -57,8 +57,8 @@ export const OfflineStatusBar: React.FC = () => {
               </span>
             )}
 
-            <div className="flex items-center gap-2 truncate">
-              <span className="font-bold tracking-wider uppercase text-[11px] flex items-center gap-1.5">
+            <div className="flex items-center gap-2 truncate min-w-0">
+              <span className="font-bold tracking-wider uppercase text-[11px] flex items-center gap-1.5 flex-shrink-0">
                 {isOffline ? (
                   <>
                     <span className="inline-block w-2 h-2 rounded-full bg-amber-300 animate-pulse" />
@@ -77,7 +77,7 @@ export const OfflineStatusBar: React.FC = () => {
                 )}
               </span>
               <span className="text-white/60 hidden sm:inline">•</span>
-              <span className="text-white/95 text-[11px] truncate">
+              <span className="text-white/95 text-[11px] truncate hidden xs:inline">
                 {isOffline
                   ? 'Live data unavailable. Showing cached/last synchronized information.'
                   : status === 'SYNCING'
@@ -87,11 +87,11 @@ export const OfflineStatusBar: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
             {pendingSyncCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/30 text-amber-100 border border-white/20 flex items-center gap-1">
                 <CloudUpload size={11} />
-                {pendingSyncCount} {pendingSyncCount === 1 ? 'report waiting to sync' : 'reports waiting to sync'}
+                {pendingSyncCount} {pendingSyncCount === 1 ? 'report to sync' : 'reports to sync'}
               </span>
             )}
 
@@ -99,9 +99,9 @@ export const OfflineStatusBar: React.FC = () => {
               <button
                 type="button"
                 onClick={triggerSync}
-                className="px-2.5 py-0.5 rounded bg-white text-slate-900 font-bold text-[10px] hover:bg-slate-100 transition-colors flex items-center gap-1 shadow-sm"
+                className="px-3 py-1.5 min-h-[32px] rounded bg-white text-slate-900 font-bold text-[11px] hover:bg-slate-100 transition-colors flex items-center gap-1.5 shadow-sm active:scale-95"
               >
-                <RefreshCw size={10} className={status === 'SYNCING' ? 'animate-spin' : ''} />
+                <RefreshCw size={11} className={status === 'SYNCING' ? 'animate-spin' : ''} />
                 Sync Now
               </button>
             )}

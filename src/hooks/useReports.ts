@@ -95,7 +95,8 @@ export const useReports = (userLat = 20.4625, userLon = 85.8828) => {
           if (report.status === 'PendingSync') {
             return {
               ...report,
-              status: report.verificationStatus === 'Verified' ? 'Verified' : 'Submitted'
+              status: 'Submitted',
+              verificationStatus: 'UnderReview'
             };
           }
           return report;
@@ -144,21 +145,27 @@ export const useReports = (userLat = 20.4625, userLon = 85.8828) => {
 
     const isCurrentOffline = !navigator.onLine;
 
+    // Report lifecycle:
+    // Offline -> 'PendingSync' (verificationStatus: 'UnderReview')
+    // Online -> 'Submitted' (verificationStatus: 'UnderReview')
+    // Reports must NEVER automatically become 'Verified' upon submission or synchronization.
     const initialStatus = aiAnalysis.verdict === 'Avoid' 
       ? 'Avoid' 
       : isCurrentOffline
         ? 'PendingSync'
-        : aiAnalysis.verdict === 'Genuine' 
-          ? 'Verified' 
-          : 'UnderReview';
+        : 'Submitted';
+
+    const initialVerificationStatus = aiAnalysis.verdict === 'Avoid'
+      ? 'Rejected'
+      : 'UnderReview';
 
     const newReport: IncidentReport = {
       ...reportData,
       id: `DRISHTI-${Date.now().toString().slice(-4)}${Math.floor(Math.random() * 90 + 10)}`,
       timestamp: new Date().toISOString(),
       status: initialStatus,
-      verificationStatus: aiAnalysis.verdict === 'Genuine' ? 'Verified' : aiAnalysis.verdict === 'Avoid' ? 'Rejected' : 'UnderReview',
-      responseStatus: aiAnalysis.verdict === 'Genuine' ? 'ResponderAssigned' : 'Unassigned',
+      verificationStatus: initialVerificationStatus,
+      responseStatus: 'Unassigned',
       sourceInfo: defaultSource,
       aiAnalysis
     };

@@ -53,8 +53,8 @@
 
 /* Collapse Toggle Button */
 .sidebar-collapse-btn {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -135,7 +135,8 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  height: 36px;
+  height: 38px;
+  min-height: 38px;
   padding: 0 10px;
   border-radius: 7px;
   color: #a1a1aa;
@@ -144,6 +145,14 @@
   text-decoration: none;
   overflow: hidden;
   user-select: none;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .sidebar-item {
+    height: 42px;
+    min-height: 42px;
+  }
 }
 
 .sidebar-icon {
@@ -252,10 +261,12 @@
   background: linear-gradient(145deg, rgba(239, 68, 68, 0.12) 0%, rgba(18, 10, 10, 0.95) 100%);
   border: 1px solid rgba(239, 68, 68, 0.22);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  min-height: 44px;
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .emergency-helpline-card:hover {
@@ -268,6 +279,7 @@
 .emergency-helpline-card.collapsed {
   justify-content: center;
   padding: 8px;
+  min-height: 40px;
 }
 
 .emergency-call-badge {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -46,8 +46,23 @@ const TILE_LAYERS: Record<MapLayerType, { url: string; attribution: string; maxZ
 
 const MapUpdater = ({ center, zoom }: { center: [number, number], zoom: number }) => {
   const map = useMap();
+  const prevCenterRef = useRef<[number, number] | null>(null);
+  const prevZoomRef = useRef<number | null>(null);
+
+  const [lat, lng] = center;
+
   useEffect(() => {
-    map.setView(center, zoom, { animate: true });
+    const prev = prevCenterRef.current;
+    const prevZ = prevZoomRef.current;
+
+    const hasCoordsChanged = !prev || Math.abs(prev[0] - lat) > 0.00001 || Math.abs(prev[1] - lng) > 0.00001;
+    const hasZoomChanged = prevZ !== null && prevZ !== zoom;
+
+    if (hasCoordsChanged || hasZoomChanged) {
+      prevCenterRef.current = [lat, lng];
+      prevZoomRef.current = zoom;
+      map.setView([lat, lng], zoom, { animate: true });
+    }
 
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
@@ -65,7 +80,7 @@ const MapUpdater = ({ center, zoom }: { center: [number, number], zoom: number }
       clearTimeout(timeout1);
       clearTimeout(timeout2);
     };
-  }, [center, zoom, map]);
+  }, [lat, lng, zoom, map]);
   return null;
 };
 
@@ -77,6 +92,12 @@ const MapClickHandler = ({
   onMapClick?: (lat: number, lng: number) => void;
   onMapDoubleClick?: (lat: number, lng: number) => void;
 }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.doubleClickZoom.disable();
+  }, [map]);
+
   useMapEvents({
     click(e) {
       if (onMapClick) {

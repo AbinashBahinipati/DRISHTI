@@ -438,6 +438,13 @@
   font-family: inherit !important;
 }
 
+@media (max-width: 600px) {
+  .drishti-map-controls-container {
+    margin: 8px 10px !important;
+    gap: 8px !important;
+  }
+}
+
 /* Mode Switcher (Street / Satellite / Dark) */
 .drishti-map-mode-bar {
   display: flex !important;
@@ -449,7 +456,9 @@
   border-radius: 12px !important;
   padding: 4px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-  gap: 3px !important;
+  gap: 4px !important;
+  flex-wrap: wrap !important;
+  max-width: calc(100vw - 32px) !important;
 }
 
 .drishti-mode-btn {
@@ -457,7 +466,8 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  padding: 6px 13px !important;
+  padding: 6px 12px !important;
+  min-height: 36px !important;
   border-radius: 8px !important;
   font-size: 12px !important;
   font-weight: 700 !important;
@@ -468,6 +478,7 @@
   transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
   background: transparent !important;
   color: #94a3b8 !important;
+  box-sizing: border-box !important;
 }
 
 .drishti-mode-btn:hover {
@@ -493,7 +504,7 @@
 .drishti-tool-group {
   display: flex !important;
   flex-direction: column !important;
-  width: 40px !important;
+  width: 44px !important;
   background: rgba(13, 15, 18, 0.95) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -507,8 +518,10 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 40px !important;
-  height: 40px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   padding: 0 !important;
   margin: 0 !important;
   background: transparent !important;
@@ -518,6 +531,7 @@
   cursor: pointer !important;
   transition: all 0.18s ease !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-sizing: border-box !important;
 }
 
 .drishti-tool-btn:last-child {

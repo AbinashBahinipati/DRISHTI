@@ -40,7 +40,7 @@ type TabFilter = 'all' | 'high' | 'medium' | 'avoid';
 
 export const Reports: React.FC = () => {
   const navigate = useNavigate();
-  const { reports } = useReports();
+  const { reports, manuallyVerifyReport } = useReports();
 
   // Filters State
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
@@ -674,14 +674,46 @@ export const Reports: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="report-modal-footer">
+              <div className="report-modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {selectedReport.verificationStatus !== 'Verified' && selectedReport.status !== 'Avoid' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="success-btn btn-primary"
+                        style={{ background: '#22c55e', color: '#000', fontWeight: 'bold', fontSize: '0.8rem', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        onClick={() => {
+                          manuallyVerifyReport(selectedReport.id, 'Genuine');
+                          setSelectedReport(prev => prev ? { ...prev, status: 'Verified', verificationStatus: 'Verified', responseStatus: 'ResponderAssigned' } : null);
+                        }}
+                      >
+                        <CheckCircle2 size={15} />
+                        Verify Incident
+                      </button>
+                      <button
+                        type="button"
+                        className="success-btn btn-secondary"
+                        style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)', fontSize: '0.8rem', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        onClick={() => {
+                          manuallyVerifyReport(selectedReport.id, 'Avoid');
+                          setSelectedReport(prev => prev ? { ...prev, status: 'Avoid', verificationStatus: 'Rejected', responseStatus: 'Unassigned' } : null);
+                        }}
+                      >
+                        <XCircle size={15} />
+                        Reject / Spam
+                      </button>
+                    </>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: selectedReport.status === 'Avoid' ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+                      <CheckCircle2 size={14} />
+                      {selectedReport.status === 'Avoid' ? 'Status: REJECTED / SPAM' : 'Status: VERIFIED INCIDENT'}
+                    </div>
+                  )}
+                </div>
+
                 <button className="success-btn btn-secondary" onClick={() => setSelectedReport(null)}>
                   Close
                 </button>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.76rem', color: 'rgba(255,255,255,0.5)' }}>
-                  <Sparkles size={13} style={{ color: '#22c55e' }} />
-                  Verified exclusively by DRISHTI AI Agent — No manual operator override
-                </div>
               </div>
             </motion.div>
           </div>

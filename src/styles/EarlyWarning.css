@@ -72,6 +72,12 @@
   flex-wrap: wrap;
 }
 
+@media (max-width: 768px) {
+  .early-warning-header-right {
+    width: 100%;
+  }
+}
+
 .ew-location-pill {
   display: flex;
   align-items: center;
@@ -80,9 +86,11 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 6px 12px;
+  min-height: 36px;
   font-size: 0.78rem;
   color: #d1d5db;
   font-weight: 500;
+  box-sizing: border-box;
 }
 
 .ew-freshness-pill {
@@ -90,11 +98,13 @@
   align-items: center;
   gap: 5px;
   border-radius: 6px;
-  padding: 4px 10px;
+  padding: 6px 10px;
+  min-height: 36px;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  box-sizing: border-box;
 }
 
 .ew-freshness-pill.fresh {
@@ -124,9 +134,10 @@
 .ew-refresh-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  min-height: 32px;
-  padding: 6px 12px;
+  min-height: 38px;
+  padding: 8px 14px;
   background: #18191c;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
@@ -136,6 +147,13 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .ew-refresh-btn {
+    min-height: 44px;
+  }
 }
 
 .ew-refresh-btn:hover {
@@ -633,20 +651,29 @@
 }
 
 .bulletin-view-map-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.72rem;
+  padding: 8px 14px;
+  min-height: 38px;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #38bdf8;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .bulletin-view-map-btn {
+    min-height: 44px;
+    width: 100%;
+  }
 }
 
 .bulletin-view-map-btn:hover {
@@ -685,24 +712,35 @@
   background: #0d0f12;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 2px;
-  gap: 2px;
+  padding: 3px;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .audience-tab {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 4px 10px;
+  padding: 6px 12px;
+  min-height: 36px;
   border-radius: 6px;
   background: transparent;
   border: none;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #8a8f98;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .audience-tab {
+    min-height: 40px;
+    flex: 1;
+  }
 }
 
 .audience-tab.active {
